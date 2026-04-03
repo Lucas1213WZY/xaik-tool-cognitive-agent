@@ -45,12 +45,7 @@ xaik-tool-cognitive-agent/
 
 ### 1. **Public API Layer** (`user_simulation/`)
 
-**Before:**
-```python
-from src.user_simulation import TrialSimulator, SessionGenerator
-```
-
-**After:**
+**Load User Simulation Functions/Classes:**
 ```python
 from user_simulation import TrialSimulator, SessionGenerator
 ```
@@ -111,7 +106,7 @@ result_df = generate_trials_from_params_csv(
 
 **Supports two data modes:**
 - **MODE 1**: Load via `ai_dataset_loader` (production)
-- **MODE 2**: Pre-computed data instances (testing/external data)
+- **MODE 2**: Pre-supplied data instances (testing/external data)
 
 See [README_API.md](README_API.md) for complete trial generation documentation.
 
@@ -222,48 +217,6 @@ results = runner.run(
 print(f"✓ Completed {len(results)} trials")
 ```
 
-## Documentation
-
-### Core Documentation
-
-- **[README_API.md](README_API.md)** — Complete trial generation API reference (start here!)
-- **[DUAL_MODE_QUICK_REFERENCE.md](DUAL_MODE_QUICK_REFERENCE.md)** — Decision trees and parameter matrix
-- **[DUAL_MODE_DATA_INPUT.md](DUAL_MODE_DATA_INPUT.md)** — Deep dive into data input modes
-- **[TRIAL_GENERATION_GUIDE.md](TRIAL_GENERATION_GUIDE.md)** — Detailed usage patterns
-- **[examples_dual_mode.py](examples_dual_mode.py)** — Copy-paste code examples
-
-### Reference Documentation
-
-- **[API_LAYERS_GUIDE.md](API_LAYERS_GUIDE.md)** — Detailed layer explanations
-- **[API_STRUCTURE.md](API_STRUCTURE.md)** — Complete file-level documentation
-- **[ARCHITECTURE.md](ARCHITECTURE.md)** — Architecture (also this README)
-
-## Migration Path
-
-### For Existing Code
-
-1. If using `from src.user_simulation import ...`:
-   - Update to `from user_simulation import ...`
-   - No code changes needed, only import statements
-
-2. If using `from src.cr_agent import ...`:
-   - Keep as is (internal module, still in `src/`)
-
-3. For experiments:
-   - Create new scripts in `experiments/`
-   - Reference example runners for patterns
-
-4. For trial generation:
-   - Use `generate_trials_full.py` API
-   - See [README_API.md](README_API.md) for examples
-
-### For New Code
-
-- Always use public API: `from user_simulation import ...`
-- For trial generation: `from generate_trials_full import generate_trials_from_params_csv`
-- Use `experiments/` for demo workflows
-- Avoid importing from `src/` directly when possible
-
 ## Project Structure by Layer
 
 ### Layer 1: User-Facing APIs
@@ -305,39 +258,6 @@ src/                      ← Don't use directly
 ├── data_loaders/
 └── memory/
 ```
-
-## Next Steps
-
-1. ✅ Move `src/user_simulation` → `user_simulation/`
-2. ✅ Create `experiments/` folder with runner examples
-3. ✅ Create trial generation API
-4. ✅ Update imports in examples
-5. ✅ Create comprehensive documentation
-6. 🔲 Update main notebooks with new patterns
-7. 🔲 Create CLI for trial generation
-8. 🔲 Add web interface for experiment configuration
-
-## Support & Troubleshooting
-
-### Common Questions
-
-**Q: Where do I import from?**  
-A: Always start with `user_simulation` for user API, or `generate_trials_full` for trial generation.
-
-**Q: How do I generate trials?**  
-A: See [README_API.md](README_API.md) for complete documentation and examples.
-
-**Q: What if I don't have loaders?**  
-A: Use MODE 2 (pre-computed data) in trial generation API. No loaders needed!
-
-**Q: Can I parallelize?**  
-A: Use multiple random seeds in separate processes. See [README_API.md#advanced-usage](README_API.md#advanced-usage).
-
-### Troubleshooting
-
-For issues with trial generation, see [README_API.md#troubleshooting](README_API.md#troubleshooting).
-
-For architecture questions, see [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ## Contributing
 
