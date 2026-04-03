@@ -10,7 +10,7 @@ from typing import Dict, List, Optional, Tuple, Any
 from gymnasium import spaces
 
 from .base_env import BaseRLEnvironment, EnvironmentConfig
-from src.memory import DeclarativeMemory, CombinedMemory
+from src.memory.memory import DeclarativeMemory, CombinedMemory
 
 
 # Mode mapping for DT strategy

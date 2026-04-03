@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from gymnasium import spaces
 
 from .base_env import BaseRLEnvironment, EnvironmentConfig
-from src.memory import DeclarativeMemory, CombinedMemory
+from src.memory.memory import DeclarativeMemory, CombinedMemory
 
 
 # Action mapping for 5 strategies

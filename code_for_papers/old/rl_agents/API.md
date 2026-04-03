@@ -925,7 +925,7 @@ Interfaces are stable but may change based on user feedback.
 
 ## See Also
 
-- [Memory Layer Docs](../core/memory/)
+- [Memory Layer Docs](../memory/)
 - [Reasoning Strategies Docs](../reasoning_strategies/)
 - [Stable-Baselines3 Docs](https://stable-baselines3.readthedocs.io/)
 - [Gymnasium Docs](https://gymnasium.farama.org/)

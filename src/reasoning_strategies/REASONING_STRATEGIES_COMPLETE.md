@@ -1,7 +1,7 @@
 # Reasoning Strategies Implementation - Complete Summary
 
 ## 🎯 Objective
-Refactor monolithic cognitive model code into a modular, plugin-based reasoning strategy architecture that integrates with the unified memory module. All 12 reasoning strategies now use the actual memory API from `src/core/memory/`.
+Refactor monolithic cognitive model code into a modular, plugin-based reasoning strategy architecture that integrates with the unified memory module. All 12 reasoning strategies now use the actual memory API from `src/memory/`.
 
 ## ✅ Completed
 

@@ -1,0 +1,355 @@
+# Architectural Restructuring: Public API Design
+
+## Overview
+
+The XAIK project has been restructured to follow a clear **public API vs. implementation** separation, inspired by frameworks like Quantus and SHAP.
+
+## New Structure
+
+```
+xaik-tool-cognitive-agent/
+├── user_simulation/              ← PUBLIC API (moved from src/)
+│   ├── __init__.py              (main exports)
+│   ├── trial_simulator.py        (per-trial simulation)
+│   ├── session_generator.py      (multi-trial sessions)
+│   ├── parameter_estimator.py    (extract distributions)
+│   ├── parameter_sampler.py      (sample parameters)
+│   ├── forward_trial_generator.py
+│   ├── distribution_loader.py
+│   ├── utils.py
+│   ├── param_config/             (default parameter files)
+│
+├── experiments/                  ← USAGE EXAMPLES & RUNNERS (NEW)
+│   ├── __init__.py
+│   ├── experiment_runner.py      (orchestrate experiments)
+│   ├── evaluation.py             (compute metrics)
+│   ├── coax_evaluation.py        (CoAX-specific experiments)
+│   ├── coxam_evaluation.py       (CoXAM-specific experiments)
+│   └── examples/                 (runnable examples)
+│
+├── src/                          ← IMPLEMENTATION (internal)
+│   ├── cr_agent/                (CoXAM orchestration)
+│   ├── reasoning_strategies/     (forward/counterfactual strategies)
+│   ├── models/                   (AI model implementations)
+│   ├── data_loaders/             (data processing)
+│   ├── memory/                   (memory systems)
+│   │   ├── memory/              (actual implementations)
+│   └── rl_agents/                (legacy RL agents)
+│
+├── generate_trials_full.py       ← TRIAL GENERATION API
+├── generate_trials_from_params.py
+└── README.md                      (this file)
+```
+
+## Key Changes
+
+### 1. **Public API Layer** (`user_simulation/`)
+
+**Before:**
+```python
+from src.user_simulation import TrialSimulator, SessionGenerator
+```
+
+**After:**
+```python
+from user_simulation import TrialSimulator, SessionGenerator
+```
+
+**Benefits:**
+- Clear user-facing API at project root
+- Matches conventions of Quantus, SHAP, Captum
+- Easier to discover for new users
+- Can evolve independently from `src/` internals
+
+### 2. **Implementation Layer** (`src/`)
+
+**No changes to imports within `src/`**, but structure is now clearer:
+- `src.cr_agent` → CoXAM orchestration
+- `src.reasoning_strategies` → Reasoning plugins
+- `src.models` → AI models (CoAX & CoXAM)
+- `src.data_loaders` → Data processing
+- `src.memory` → Cognitive memory backends
+
+### 3. **Experiments Layer** (`experiments/`)
+
+**Purpose:** Example workflows and experiment runners
+
+```python
+from experiments import ExperimentRunner, EvaluationMetrics
+
+config = ExperimentRunner.Config(
+    dataset="wine_quality",
+    reasoning_model="coxam",
+    n_participants=50
+)
+runner = ExperimentRunner(config)
+results = runner.run()
+metrics = EvaluationMetrics(results)
+```
+
+**Components:**
+- `experiment_runner.py`: Orchestrate full experiments
+- `evaluation.py`: Compute metrics (accuracy, response time, XAI impact)
+- `coax_evaluation.py`: CoAX-specific evaluation
+- `coxam_evaluation.py`: CoXAM-specific evaluation with CR agent
+
+### 4. **Trial Generation API** (NEW)
+
+**Purpose:** Generate trial-by-trial data from best-optimized parameters
+
+```python
+from generate_trials_full import generate_trials_from_params_csv
+
+result_df = generate_trials_from_params_csv(
+    mode='experiment',
+    model=ppo_model,
+    data_instances_dict=data_dict,  # Pre-computed or loaded
+    param_csv_path='params.csv',
+    output_csv='trials.csv'
+)
+```
+
+**Supports two data modes:**
+- **MODE 1**: Load via `ai_dataset_loader` (production)
+- **MODE 2**: Pre-computed data instances (testing/external data)
+
+See [README_API.md](README_API.md) for complete trial generation documentation.
+
+## Import Patterns
+
+### User-Facing (Public API)
+
+```python
+# Generate synthetic responses
+from user_simulation import (
+    TrialSimulator, 
+    SessionGenerator,
+    ParameterSampler,
+    TrialConfig
+)
+
+simulator = TrialSimulator()
+responses = simulator.simulate(config)
+```
+
+### Experiment Runners
+
+```python
+# Run evaluation workflows
+from experiments import ExperimentRunner, EvaluationMetrics
+from user_simulation import TrialSimulator
+
+runner = ExperimentRunner(config)
+results = runner.run()
+metrics = EvaluationMetrics(results).summary()
+```
+
+### Trial Generation API
+
+```python
+# Generate trials from optimized parameters
+from generate_trials_full import generate_trials_from_params_csv
+
+df = generate_trials_from_params_csv(
+    model=ppo_model,
+    mode='experiment',
+    data_instances_dict=my_data,
+    param_csv_path='params.csv'
+)
+```
+
+### Internal (Implementation)
+
+```python
+# Within src modules, import from src
+from src.reasoning_strategies import StrategyRegistry
+from src.memory.memory import UnifiedMemory
+from src.models import ModelFactory
+from src.data_loaders import UnifiedDataLoader
+```
+
+## Benefits of This Architecture
+
+| Aspect | Benefit |
+|--------|---------|
+| **Discoverability** | Users find main API at project root |
+| **Separation of Concerns** | Implementation details in `src/` |
+| **Extensibility** | Can add `notebooks/`, `cli/`, `web/` without cluttering |
+| **Backward Compatibility** | Can deprecate `src/user_simulation` gradually |
+| **Framework Pattern** | Matches Quantus, SHAP, scikit-learn conventions |
+| **Documentation** | Clear distinction between public vs internal |
+| **Trial Generation** | Standalone API for data generation workflows |
+
+## Quick Start
+
+### Generate Trial Data
+
+```python
+import numpy as np
+from generate_trials_full import generate_trials_from_params_csv
+
+# Create sample data
+data = [np.random.rand(6) for _ in range(40)]
+
+# Generate trials
+result_df = generate_trials_from_params_csv(
+    model=your_ppo_model,
+    user_loader=None,
+    ai_dataset_loader=None,
+    strategies={0: 'strategy_0', 1: 'strategy_1'},
+    XAI_types={0: 'DT', 1: 'LR'},
+    training_cog_params={'rt': [-2, 0.5]},
+    param_csv_path='user_simulation/param_config/CoXAM_counterfactual_simulation_cog_param.csv',
+    mode='participant',
+    data_instances=data,
+    output_csv='output.csv'
+)
+
+print(f"✓ Generated {len(result_df)} trials")
+```
+
+### Run Experiments
+
+```python
+from experiments import ExperimentRunner
+
+runner = ExperimentRunner()
+results = runner.run(
+    n_participants=50,
+    n_trials_per_participant=40,
+    dataset='wine_quality'
+)
+print(f"✓ Completed {len(results)} trials")
+```
+
+## Documentation
+
+### Core Documentation
+
+- **[README_API.md](README_API.md)** — Complete trial generation API reference (start here!)
+- **[DUAL_MODE_QUICK_REFERENCE.md](DUAL_MODE_QUICK_REFERENCE.md)** — Decision trees and parameter matrix
+- **[DUAL_MODE_DATA_INPUT.md](DUAL_MODE_DATA_INPUT.md)** — Deep dive into data input modes
+- **[TRIAL_GENERATION_GUIDE.md](TRIAL_GENERATION_GUIDE.md)** — Detailed usage patterns
+- **[examples_dual_mode.py](examples_dual_mode.py)** — Copy-paste code examples
+
+### Reference Documentation
+
+- **[API_LAYERS_GUIDE.md](API_LAYERS_GUIDE.md)** — Detailed layer explanations
+- **[API_STRUCTURE.md](API_STRUCTURE.md)** — Complete file-level documentation
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** — Architecture (also this README)
+
+## Migration Path
+
+### For Existing Code
+
+1. If using `from src.user_simulation import ...`:
+   - Update to `from user_simulation import ...`
+   - No code changes needed, only import statements
+
+2. If using `from src.cr_agent import ...`:
+   - Keep as is (internal module, still in `src/`)
+
+3. For experiments:
+   - Create new scripts in `experiments/`
+   - Reference example runners for patterns
+
+4. For trial generation:
+   - Use `generate_trials_full.py` API
+   - See [README_API.md](README_API.md) for examples
+
+### For New Code
+
+- Always use public API: `from user_simulation import ...`
+- For trial generation: `from generate_trials_full import generate_trials_from_params_csv`
+- Use `experiments/` for demo workflows
+- Avoid importing from `src/` directly when possible
+
+## Project Structure by Layer
+
+### Layer 1: User-Facing APIs
+
+```
+user_simulation/          ← Use this
+├── TrialSimulator
+├── SessionGenerator
+├── ParameterSampler
+├── ParameterEstimator
+└── ...
+```
+
+### Layer 2: Experiment Runners
+
+```
+experiments/              ← Use this for workflows
+├── ExperimentRunner
+├── EvaluationMetrics
+└── examples/
+```
+
+### Layer 3: Trial Generation API
+
+```
+generate_trials_*         ← Use this for data generation
+├── generate_trials_from_params_csv()
+├── generate_participant_session()
+└── generate_single_trial()
+```
+
+### Layer 4: Implementation (Internal)
+
+```
+src/                      ← Don't use directly
+├── cr_agent/
+├── reasoning_strategies/
+├── models/
+├── data_loaders/
+└── memory/
+```
+
+## Next Steps
+
+1. ✅ Move `src/user_simulation` → `user_simulation/`
+2. ✅ Create `experiments/` folder with runner examples
+3. ✅ Create trial generation API
+4. ✅ Update imports in examples
+5. ✅ Create comprehensive documentation
+6. 🔲 Update main notebooks with new patterns
+7. 🔲 Create CLI for trial generation
+8. 🔲 Add web interface for experiment configuration
+
+## Support & Troubleshooting
+
+### Common Questions
+
+**Q: Where do I import from?**  
+A: Always start with `user_simulation` for user API, or `generate_trials_full` for trial generation.
+
+**Q: How do I generate trials?**  
+A: See [README_API.md](README_API.md) for complete documentation and examples.
+
+**Q: What if I don't have loaders?**  
+A: Use MODE 2 (pre-computed data) in trial generation API. No loaders needed!
+
+**Q: Can I parallelize?**  
+A: Use multiple random seeds in separate processes. See [README_API.md#advanced-usage](README_API.md#advanced-usage).
+
+### Troubleshooting
+
+For issues with trial generation, see [README_API.md#troubleshooting](README_API.md#troubleshooting).
+
+For architecture questions, see [ARCHITECTURE.md](ARCHITECTURE.md).
+
+## Contributing
+
+To extend this project:
+
+1. **Public API changes**: Update `user_simulation/`
+2. **Trial generation**: Extend `generate_trials_full.py`
+3. **Experiments**: Add to `experiments/` folder
+4. **Implementation**: Modify `src/` modules
+
+Always maintain the public/internal separation!
+
+## License
+
+See [LICENSE](LICENSE) file.

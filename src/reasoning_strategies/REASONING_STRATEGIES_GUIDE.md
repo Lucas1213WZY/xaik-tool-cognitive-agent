@@ -356,9 +356,9 @@ def counterfactual(features, strategy_name="zeroout_lr_heuristic"):
 ## Troubleshooting
 
 ### Issue: Memory import errors
-**Solution**: Ensure `src/core/memory/` files exist and are compiled:
+**Solution**: Ensure `src/memory/` files exist and are compiled:
 ```bash
-python3 -m py_compile src/core/memory/*.py
+python3 -m py_compile src/memory/*.py
 ```
 
 ### Issue: Strategy not registering
@@ -380,5 +380,5 @@ for trial in trials:
 ## References
 
 - [Memory Consolidation Guide](MEMORY_CONSOLIDATION_GUIDE.md) - Unified memory API
-- [src/core/memory/interface.py](src/core/memory/interface.py) - Memory contracts
+- [src/memory/interface.py](src/memory/interface.py) - Memory contracts
 - [src/reasoning_strategies/interface.py](src/reasoning_strategies/interface.py) - Strategy contracts

@@ -16,7 +16,7 @@ Public API:
 Usage Examples:
 
   # CoAX (exemplar) backend
-  from src.core.memory import UnifiedMemory
+  from src.memory.memory import UnifiedMemory
   memory = UnifiedMemory.create_for_coax(decay_param=0.3)
   memory.store("ex1", Exemplar(...))
   retrieved = memory.retrieve(query, k=5)

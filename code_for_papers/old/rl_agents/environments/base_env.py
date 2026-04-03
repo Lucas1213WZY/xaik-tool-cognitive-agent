@@ -20,7 +20,7 @@ import numpy as np
 import gymnasium as gym
 from gymnasium import spaces
 
-from src.core.memory import UnifiedMemory, MemoryConfig, MemoryBackend
+from src.memory.memory import UnifiedMemory, MemoryConfig, MemoryBackend
 from src.reasoning_strategies import StrategyRegistry, StrategyConfig, StrategyType, ReasoningMode
 
 

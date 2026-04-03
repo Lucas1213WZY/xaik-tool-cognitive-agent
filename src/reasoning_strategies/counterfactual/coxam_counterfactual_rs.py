@@ -17,8 +17,8 @@ from typing import Dict, Any, Optional, Tuple, List
 import numpy as np
 import math
 
-from src.core.memory import UnifiedMemory, MemoryConfig, Exemplar
-from src.core.memory.utils import euclidean_distance, normalize_probabilities
+from src.memory.memory import UnifiedMemory, MemoryConfig, Exemplar
+from src.memory.memory.utils import euclidean_distance, normalize_probabilities
 from ..interface import CounterfactualStrategy, StrategyConfig, StrategyMetadata, StrategyType
 
 

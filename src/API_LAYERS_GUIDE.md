@@ -6,13 +6,13 @@
 🎯 user_simulation/         ← Start here for human-like response generation
     ├─ CoAX path:
     │  └── 📚 reasoning_strategies/    (Forward: SensitiveFeatures, SalientFeatures, ImportanceCategorization, AttributionSum)
-    │      ├── uses: 🧠 core/memory/
+    │      ├── uses: 🧠 memory/
     │      └── uses: 🤖 models/
     │
     └─ CoXAM path:
        └──🟦 cr_agent/                (strategy selection + memory)
            └── 📚 reasoning_strategies/    (Forward: DTTraversal, LRCalculation, LRHeuristic; CF: ZeroOutLRHeuristic, ChangeDTPath, MemoryBasedCF)
-               ├── uses: 🧠 core/memory/
+               ├── uses: 🧠 memory/
                └── uses: 🤖 models/
     
 💾 data_loaders/            ← Data processing (shared: Explainers, Normalizers, Filters)
@@ -51,12 +51,11 @@ src/
 │   │   └── coxam_forward_rs.py        (DTTraversal, LRCalculation, LRHeuristic)
 │   ├── counterfactual/
 │   │   └── coxam_counterfactual_rs.py (ZeroOutLRHeuristic, ChangeDTPath, etc.)
-│   └── core/                           ← Layer 3a: Integrated memory infrastructure
-│       └── memory/
-│           ├── actr_memory.py          (ACT-R activation, decay, retrieval)
-│           ├── exemplar_memory.py      (Similarity-based exemplar storage)
-│           ├── unified_memory.py       (Shared interface)
-│           └── utils.py
+│   └── memory/                         ← Layer 3a: Integrated memory infrastructure
+│       ├── actr_memory.py          (ACT-R activation, decay, retrieval)
+│       ├── exemplar_memory.py      (Similarity-based exemplar storage)
+│       ├── unified_memory.py       (Shared interface)
+│       └── utils.py
 │
 ├── models/                             ← Layer 2: AI model implementations
 │   ├── models.py                       (Model factory)
@@ -144,7 +143,7 @@ explanations = model.explain(X_test)
 
 ---
 
-### Layer 3a: Core Memory - `core/memory/`
+### Layer 3a: Core Memory - `memory/`
 **Purpose:** Integrated memory infrastructure used by reasoning strategies.
 
 **What it does:**
@@ -159,7 +158,7 @@ explanations = model.explain(X_test)
 
 **Quick Example:**
 ```python
-from src.reasoning_strategies.core.memory import UnifiedMemory, ACTRMemory
+from src.reasoning_strategies.memory import UnifiedMemory, ACTRMemory
 
 memory = ACTRMemory()
 # Memory is used internally by reasoning strategies
@@ -173,7 +172,7 @@ memory = ACTRMemory()
 **What it does:**
 - **Forward strategies:** DTTraversal, LRCalculation, LRHeuristic, SensitiveFeatures, SalientFeatures
 - **Counterfactual strategies:** ZeroOutLRHeuristic, ChangeDTPath, MemoryBasedCF
-- **Uses:** Integrated memory (`core/memory/`) + AI models (`models/`)
+- **Uses:** Integrated memory (`memory/`) + AI models (`models/`)
 
 **When to use:**
 - Implementing human-like reasoning
@@ -383,7 +382,7 @@ session = session_gen.generate_session(
 |-------|---------------|---------|
 | `data_loaders/` | **Stateless** — no memory, just processing | Feature normalization, importance |
 | `models/` | **Unified factory** — CoAX or CoXAM | Model factory with registry |
-| `core/memory/` | **Integrated infrastructure** — shared by all strategies | ACT-R activation & decay |
+| `memory/` | **Integrated infrastructure** — shared by all strategies | ACT-R activation & decay |
 | `reasoning_strategies/` | **Plugins + Memory** — used by both CoAX & CoXAM | DTTraversal (CoXAM), SensitiveFeatures (CoAX) |
 | `cr_agent/` | **CoXAM-only orchestration** — selects CoXAM strategy | PPO model picks DT vs LR (CoXAM only) |
 | `user_simulation/` | **High-level generation** — both CoAX & CoXAM paths | SessionGenerator with reasoning_model='coxam' or 'coax' |
@@ -408,7 +407,7 @@ session = session_gen.generate_session(
 
 Memory is **integrated into reasoning strategies** at Layer 3:
 
-**For CoXAM path:** Memory is used through `cr_agent/` → `reasoning_strategies/` → `core/memory/`
+**For CoXAM path:** Memory is used through `cr_agent/` → `reasoning_strategies/` → `memory/`
 
 ```python
 # CoXAM: Memory integrated via cr_agent
@@ -418,12 +417,12 @@ runner = CRAgentRunner(...)  # Uses cr_agent for strategy selection
 results = runner.run_forward_episode(...)  # Memory handled internally
 ```
 
-**For CoAX path:** Memory is used directly through `reasoning_strategies/` → `core/memory/`
+**For CoAX path:** Memory is used directly through `reasoning_strategies/` → `memory/`
 
 ```python
 # CoAX: Memory integrated directly in strategies
 from src.reasoning_strategies import SensitiveFeatures
-from src.reasoning_strategies.core.memory import UnifiedMemory
+from src.reasoning_strategies.memory import UnifiedMemory
 
 strategy = SensitiveFeatures(config)
 memory = UnifiedMemory()
@@ -440,7 +439,7 @@ probs, time, info = strategy.infer(
 - `models/` — single predictions only
 
 **Memory located in:**
-- `reasoning_strategies/core/memory/` — shared infrastructure (ACT-R, Exemplar)
+- `reasoning_strategies/memory/` — shared infrastructure (ACT-R, Exemplar)
 - `cr_agent/` — preserves & manages memory across strategy selections (CoXAM only)
 - `user_simulation/` — tracks memory across trials for both paths
 

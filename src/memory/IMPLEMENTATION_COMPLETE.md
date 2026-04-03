@@ -9,16 +9,13 @@ Successfully consolidated **CoAX** and **CoXAM** cognitive memory systems into a
 ### Core Implementation (1,257 lines)
 
 ```
-src/core/memory/
+src/memory/
 ├── __init__.py                    Public API exports
 ├── interface.py                   Abstract contracts (MemoryInterface, Exemplar, Chunk)
 ├── utils.py                       Shared utilities (distance, activation, latency)
 ├── exemplar_memory.py             CoAX backend (temporal decay, similarity)
 ├── actr_memory.py                 CoXAM backend (BLL, spreading, working memory)
 └── unified_memory.py              Factory & adapter (MemoryConfig, UnifiedMemory)
-
-src/core/
-└── __init__.py                    Core module exports
 ```
 
 ### Documentation

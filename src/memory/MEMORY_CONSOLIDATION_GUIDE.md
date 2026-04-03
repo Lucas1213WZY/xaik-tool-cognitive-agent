@@ -2,7 +2,7 @@
 
 ## Overview
 
-The unified memory module (`src/core/memory/`) consolidates two distinct cognitive memory systems - **CoAX** (exemplar-based) and **CoXAM** (ACT-R-based) - into a single, production-ready abstraction layer.
+The unified memory module (`src/memory/`) consolidates two distinct cognitive memory systems - **CoAX** (exemplar-based) and **CoXAM** (ACT-R-based) - into a single, production-ready abstraction layer.
 
 **Total Implementation**: 1,257 lines of production code, fully syntactically validated.
 
