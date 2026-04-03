@@ -1,0 +1,2 @@
+feature_names,target_name,target_options,ordinal_feature_indices,categorical_feature_options,feature_boundaries,dataset_name
+"['Alcohol', 'Sulphates', 'SO2', 'Vinegar Taint', 'pH', 'Chlorides']",quality,"['Type 1', 'Type 2']",[],{},"{0: (9.0, 12.9), 1: (0.44, 1.13), 2: (9.0, 135.0), 3: (0.22960000000000003, 0.96), 4: (3.0, 3.66), 5: (0.047, 0.226)}",wine_quality

@@ -1,0 +1,50 @@
+════════════════════════════════════════════════════════════
+  XAI TESTER — SESSION SUMMARY
+────────────────────────────────────────────────────────────
+  Experiment    : LoanApproval_XAI
+  Participant   : 0
+  Trials total  : 12
+  Trials done   : 12
+  Session time  : 16.378 s
+────────────────────────────────────────────────────────────
+
+  PARTICIPANT ACCURACY  (predicted AI label correctly?)
+────────────────────────────────────────────────────────────
+  Correct   : 0 / 12
+  Incorrect : 12 / 12
+  Accuracy  : 0.00000%
+
+  AI MODEL ACCURACY  (AI label matched ground truth?)
+────────────────────────────────────────────────────────────
+  AI correct   : 11 / 12
+  AI incorrect : 1 / 12
+  AI accuracy  : 91.66667%
+
+  PARTICIPANT ACCURACY BY AI CORRECTNESS
+────────────────────────────────────────────────────────────
+  When AI was correct : 0.00000%
+  When AI was wrong   : 0.00000%
+
+  RESPONSE TIMES (seconds)
+────────────────────────────────────────────────────────────
+  Mean   : 0.785
+  Median : 0.323
+  SD     : 1.147
+  Min    : 0.000
+  Max    : 3.345
+
+  PER-LABEL BREAKDOWN
+────────────────────────────────────────────────────────────
+  [Approved]  n=2  acc=0.00000%  mean_RT=0.247 s
+  [Rejected]  n=10  acc=0.00000%  mean_RT=0.893 s
+
+  TOP FEATURES BY MEAN |IMPORTANCE|
+────────────────────────────────────────────────────────────
+  xai_income_k                    0.142
+  xai_credit_score                0.130
+  xai_debt_ratio                  0.104
+  xai_loan_amount_k               0.070
+  xai_employment_years            0.049
+  xai_age                         0.034
+
+════════════════════════════════════════════════════════════

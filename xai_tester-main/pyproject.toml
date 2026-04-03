@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xai-tester"
+version = "0.1.0"
+description = "Human-subject XAI evaluation experiment framework"
+requires-python = ">=3.10"
+dependencies = []   # stdlib only
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-cov"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["xai_tester*"]

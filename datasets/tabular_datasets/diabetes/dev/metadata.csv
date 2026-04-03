@@ -1,0 +1,2 @@
+feature_names,target_name,target_options,ordinal_feature_indices,categorical_feature_options,feature_boundaries,dataset_name
+"['Physical Activity', 'Eats Fruits', 'Eats Vegetables', 'Drinks Alcohol', 'Smoker', 'Education Level', 'Has Healthcare Access', 'Sex']",Diabetes,"['Diabetes', 'No Diabetes']",[],"{0: ['No', 'Yes'], 1: ['No', 'Yes'], 2: ['No', 'Yes'], 3: ['No', 'Yes'], 4: ['No', 'Yes'], 5: ['No School/Kindergarten', 'Grades 1-8', 'Grades 9-11', 'High School Graduate', 'Some College/Tech School', 'College Graduate'], 6: ['No', 'Yes'], 7: ['Female', 'Male']}",{},diabetes

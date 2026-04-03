@@ -1,0 +1,464 @@
+{
+  "adult/Importance categorization/importance/with_xai": {
+    "appId": "adult",
+    "strategy": "Importance categorization",
+    "xai_type": "importance",
+    "tested_with_xai": "w/ XAI",
+    "n_samples": 11,
+    "parameters": {
+      "sensitivity": {
+        "min": 1.0,
+        "max": 100.0,
+        "mean": 25.74804311036364,
+        "std": 28.25479493414913,
+        "median": 19.227080096,
+        "count": 11
+      },
+      "k": {
+        "min": 1.0,
+        "max": 5.0,
+        "mean": 3.0,
+        "std": 1.9069251784911847,
+        "median": 3.0,
+        "count": 11
+      },
+      "retrieval_threshold": {
+        "min": -4.0,
+        "max": -1.5,
+        "mean": -2.732387133181818,
+        "std": 0.7851849861226078,
+        "median": -2.792449355,
+        "count": 11
+      }
+    }
+  },
+  "adult/Salient-features categorization/importance/with_xai": {
+    "appId": "adult",
+    "strategy": "Salient-features categorization",
+    "xai_type": "importance",
+    "tested_with_xai": "w/ XAI",
+    "n_samples": 61,
+    "parameters": {
+      "sensitivity": {
+        "min": 1.0,
+        "max": 100.0,
+        "mean": 85.1687323487049,
+        "std": 26.509498040898055,
+        "median": 100.0,
+        "count": 61
+      },
+      "k": {
+        "min": 1.0,
+        "max": 5.0,
+        "mean": 2.2131147540983607,
+        "std": 0.7916522273868614,
+        "median": 2.0,
+        "count": 61
+      },
+      "retrieval_threshold": {
+        "min": -4.0,
+        "max": -1.889563625,
+        "mean": -3.2004567541967215,
+        "std": 0.4913693953113822,
+        "median": -3.003656947,
+        "count": 61
+      }
+    }
+  },
+  "adult/Salient-features categorization/importance/without_xai": {
+    "appId": "adult",
+    "strategy": "Salient-features categorization",
+    "xai_type": "importance",
+    "tested_with_xai": "w/o XAI",
+    "n_samples": 41,
+    "parameters": {
+      "sensitivity": {
+        "min": 2.9123746377,
+        "max": 100.0,
+        "mean": 44.99394562156829,
+        "std": 31.508530600001748,
+        "median": 35.98996186,
+        "count": 41
+      },
+      "k": {
+        "min": 1.0,
+        "max": 5.0,
+        "mean": 2.292682926829268,
+        "std": 1.4011128406190314,
+        "median": 2.0,
+        "count": 41
+      },
+      "retrieval_threshold": {
+        "min": -4.0,
+        "max": -2.217398607,
+        "mean": -3.2944742137073173,
+        "std": 0.5150114108583911,
+        "median": -3.185119925,
+        "count": 41
+      }
+    }
+  },
+  "adult/Sensitive-features categorization/importance/with_xai": {
+    "appId": "adult",
+    "strategy": "Sensitive-features categorization",
+    "xai_type": "importance",
+    "tested_with_xai": "w/ XAI",
+    "n_samples": 19,
+    "parameters": {
+      "sensitivity": {
+        "min": 6.1422129677,
+        "max": 100.0,
+        "mean": 59.74319677182633,
+        "std": 37.28371687000925,
+        "median": 75.860345096,
+        "count": 19
+      },
+      "k": {
+        "min": 1.0,
+        "max": 5.0,
+        "mean": 3.526315789473684,
+        "std": 1.4278589438158462,
+        "median": 4.0,
+        "count": 19
+      },
+      "retrieval_threshold": {
+        "min": -4.0,
+        "max": -1.423552897,
+        "mean": -2.587005091842105,
+        "std": 0.9015450274372393,
+        "median": -2.30473704,
+        "count": 19
+      }
+    }
+  },
+  "adult/Sensitive-features categorization/importance/without_xai": {
+    "appId": "adult",
+    "strategy": "Sensitive-features categorization",
+    "xai_type": "importance",
+    "tested_with_xai": "w/o XAI",
+    "n_samples": 22,
+    "parameters": {
+      "sensitivity": {
+        "min": 7.8477637025,
+        "max": 100.0,
+        "mean": 64.46266880924999,
+        "std": 33.127668997018354,
+        "median": 78.59953705699999,
+        "count": 22
+      },
+      "k": {
+        "min": 1.0,
+        "max": 5.0,
+        "mean": 3.227272727272727,
+        "std": 1.165091419816027,
+        "median": 3.0,
+        "count": 22
+      },
+      "retrieval_threshold": {
+        "min": -4.0,
+        "max": -1.495969861,
+        "mean": -2.4405599354090906,
+        "std": 0.8913215210225791,
+        "median": -1.963133134,
+        "count": 22
+      }
+    }
+  },
+  "forest_cover/Importance categorization/importance/with_xai": {
+    "appId": "forest_cover",
+    "strategy": "Importance categorization",
+    "xai_type": "importance",
+    "tested_with_xai": "w/ XAI",
+    "n_samples": 24,
+    "parameters": {
+      "sensitivity": {
+        "min": 2.3396591281,
+        "max": 100.0,
+        "mean": 35.717108438249994,
+        "std": 30.751223672762915,
+        "median": 23.906331075,
+        "count": 24
+      },
+      "k": {
+        "min": 1.0,
+        "max": 5.0,
+        "mean": 2.6666666666666665,
+        "std": 1.2133516482134197,
+        "median": 2.5,
+        "count": 24
+      },
+      "retrieval_threshold": {
+        "min": -4.0,
+        "max": -1.614111989,
+        "mean": -2.9736435719583327,
+        "std": 0.6885823319656383,
+        "median": -2.9795452955,
+        "count": 24
+      }
+    }
+  },
+  "forest_cover/Salient-features categorization/importance/with_xai": {
+    "appId": "forest_cover",
+    "strategy": "Salient-features categorization",
+    "xai_type": "importance",
+    "tested_with_xai": "w/ XAI",
+    "n_samples": 16,
+    "parameters": {
+      "sensitivity": {
+        "min": 1.0,
+        "max": 100.0,
+        "mean": 23.77250602255625,
+        "std": 34.77285595052726,
+        "median": 9.1681857795,
+        "count": 16
+      },
+      "k": {
+        "min": 1.0,
+        "max": 4.0,
+        "mean": 2.25,
+        "std": 1.0897247358851685,
+        "median": 2.5,
+        "count": 16
+      },
+      "retrieval_threshold": {
+        "min": -4.0,
+        "max": -1.5,
+        "mean": -2.850741222,
+        "std": 1.0030039457563251,
+        "median": -2.824787281,
+        "count": 16
+      }
+    }
+  },
+  "forest_cover/Salient-features categorization/importance/without_xai": {
+    "appId": "forest_cover",
+    "strategy": "Salient-features categorization",
+    "xai_type": "importance",
+    "tested_with_xai": "w/o XAI",
+    "n_samples": 17,
+    "parameters": {
+      "sensitivity": {
+        "min": 1.0,
+        "max": 100.0,
+        "mean": 33.235416661241175,
+        "std": 35.11002398126798,
+        "median": 15.262561244,
+        "count": 17
+      },
+      "k": {
+        "min": 1.0,
+        "max": 4.0,
+        "mean": 2.8823529411764706,
+        "std": 1.2310852668503736,
+        "median": 4.0,
+        "count": 17
+      },
+      "retrieval_threshold": {
+        "min": -4.0,
+        "max": -1.576116799,
+        "mean": -2.959199511,
+        "std": 0.6304529188853426,
+        "median": -2.998761952,
+        "count": 17
+      }
+    }
+  },
+  "forest_cover/Sensitive-features categorization/importance/with_xai": {
+    "appId": "forest_cover",
+    "strategy": "Sensitive-features categorization",
+    "xai_type": "importance",
+    "tested_with_xai": "w/ XAI",
+    "n_samples": 23,
+    "parameters": {
+      "sensitivity": {
+        "min": 5.8445179919,
+        "max": 100.0,
+        "mean": 42.613200822734775,
+        "std": 33.86685450243743,
+        "median": 37.044093475,
+        "count": 23
+      },
+      "k": {
+        "min": 1.0,
+        "max": 5.0,
+        "mean": 2.5217391304347827,
+        "std": 1.4101978034979874,
+        "median": 2.0,
+        "count": 23
+      },
+      "retrieval_threshold": {
+        "min": -4.0,
+        "max": -0.853496335,
+        "mean": -2.9738155048260864,
+        "std": 0.7722391801966197,
+        "median": -2.920671193,
+        "count": 23
+      }
+    }
+  },
+  "wine_quality/Importance categorization/importance/with_xai": {
+    "appId": "wine_quality",
+    "strategy": "Importance categorization",
+    "xai_type": "importance",
+    "tested_with_xai": "w/ XAI",
+    "n_samples": 12,
+    "parameters": {
+      "sensitivity": {
+        "min": 1.0,
+        "max": 100.0,
+        "mean": 65.09438469635,
+        "std": 38.639171527372916,
+        "median": 86.898636293,
+        "count": 12
+      },
+      "k": {
+        "min": 1.0,
+        "max": 5.0,
+        "mean": 2.8333333333333335,
+        "std": 1.51840559652405,
+        "median": 3.0,
+        "count": 12
+      },
+      "retrieval_threshold": {
+        "min": -3.788243921,
+        "max": -1.5,
+        "mean": -2.65339038875,
+        "std": 0.7753646319632604,
+        "median": -2.487435707,
+        "count": 12
+      }
+    }
+  },
+  "wine_quality/Salient-features categorization/importance/with_xai": {
+    "appId": "wine_quality",
+    "strategy": "Salient-features categorization",
+    "xai_type": "importance",
+    "tested_with_xai": "w/ XAI",
+    "n_samples": 36,
+    "parameters": {
+      "sensitivity": {
+        "min": 1.0,
+        "max": 100.0,
+        "mean": 43.91260650040556,
+        "std": 38.707240781850224,
+        "median": 32.10393869,
+        "count": 36
+      },
+      "k": {
+        "min": 1.0,
+        "max": 4.0,
+        "mean": 1.9444444444444444,
+        "std": 1.1772011166898384,
+        "median": 1.0,
+        "count": 36
+      },
+      "retrieval_threshold": {
+        "min": -4.0,
+        "max": -1.687931039,
+        "mean": -2.7174722265277773,
+        "std": 0.7234350136260144,
+        "median": -2.8228173400000003,
+        "count": 36
+      }
+    }
+  },
+  "wine_quality/Salient-features categorization/importance/without_xai": {
+    "appId": "wine_quality",
+    "strategy": "Salient-features categorization",
+    "xai_type": "importance",
+    "tested_with_xai": "w/o XAI",
+    "n_samples": 46,
+    "parameters": {
+      "sensitivity": {
+        "min": 1.0,
+        "max": 100.0,
+        "mean": 28.202249411828262,
+        "std": 31.778317619769112,
+        "median": 15.9647969955,
+        "count": 46
+      },
+      "k": {
+        "min": 1.0,
+        "max": 4.0,
+        "mean": 1.7826086956521738,
+        "std": 1.0817265482282372,
+        "median": 1.0,
+        "count": 46
+      },
+      "retrieval_threshold": {
+        "min": -4.0,
+        "max": -2.308468123,
+        "mean": -3.4412952593478257,
+        "std": 0.4887921973760968,
+        "median": -3.4734230875,
+        "count": 46
+      }
+    }
+  },
+  "wine_quality/Sensitive-features categorization/importance/with_xai": {
+    "appId": "wine_quality",
+    "strategy": "Sensitive-features categorization",
+    "xai_type": "importance",
+    "tested_with_xai": "w/ XAI",
+    "n_samples": 35,
+    "parameters": {
+      "sensitivity": {
+        "min": 1.0,
+        "max": 100.0,
+        "mean": 13.792180342325716,
+        "std": 18.292270937007505,
+        "median": 7.7786270223,
+        "count": 35
+      },
+      "k": {
+        "min": 1.0,
+        "max": 5.0,
+        "mean": 2.3142857142857145,
+        "std": 1.3043099669158087,
+        "median": 2.0,
+        "count": 35
+      },
+      "retrieval_threshold": {
+        "min": -4.0,
+        "max": -1.603316982,
+        "mean": -2.808562618114286,
+        "std": 0.8598472661870536,
+        "median": -3.03125408,
+        "count": 35
+      }
+    }
+  },
+  "wine_quality/Sensitive-features categorization/importance/without_xai": {
+    "appId": "wine_quality",
+    "strategy": "Sensitive-features categorization",
+    "xai_type": "importance",
+    "tested_with_xai": "w/o XAI",
+    "n_samples": 50,
+    "parameters": {
+      "sensitivity": {
+        "min": 1.0,
+        "max": 100.0,
+        "mean": 20.904875938214,
+        "std": 25.54618043051269,
+        "median": 13.912898347999999,
+        "count": 50
+      },
+      "k": {
+        "min": 1.0,
+        "max": 5.0,
+        "mean": 2.06,
+        "std": 1.4478950238190613,
+        "median": 1.0,
+        "count": 50
+      },
+      "retrieval_threshold": {
+        "min": -4.0,
+        "max": -1.308693149,
+        "mean": -2.91747919724,
+        "std": 0.8358505231489002,
+        "median": -2.889140507,
+        "count": 50
+      }
+    }
+  }
+}

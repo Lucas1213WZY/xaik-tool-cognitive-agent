@@ -1,0 +1,2 @@
+appId,a0,v0_min,v0_max,a1,v1_min,v1_max,y,y0,y1
+wine_quality_iter2,Vinegar Taint,0.27,0.84,pH,3.06,3.57,quality,Type 1,Type 2

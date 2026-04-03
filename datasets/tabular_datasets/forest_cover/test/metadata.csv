@@ -1,0 +1,2 @@
+feature_names,target_name,target_options,ordinal_feature_indices,categorical_feature_options,feature_boundaries,dataset_name
+"['Elevation', 'Aspect', 'Slope', 'Horizontal_Distance_To_Hydrology', 'Horizontal_Distance_To_Roadways', 'Hillshade_9am']",Cover_Type,"['Spruce/Fir', 'Lodgepole Pine']",[],{},"{0: (2001.0, 2752.0), 1: (6.0, 353.0), 2: (4.0, 38.0), 3: (0.0, 541.0), 4: (95.0, 2516.0), 5: (109.0, 253.0)}",forest_cover

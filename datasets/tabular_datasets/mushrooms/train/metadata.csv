@@ -1,0 +1,2 @@
+feature_names,target_name,target_options,ordinal_feature_indices,categorical_feature_options,feature_boundaries,dataset_name
+"['Bruises', 'Height', 'Width', 'Shape', 'Cap Diameter', 'Gill']",poisonous,"['Type 1', 'Type 2']",[],"{0: ['no', 'yes'], 3: ['convex', 'flat'], 5: ['no', 'yes']}","{1: (1.9356, 11.074399999999995), 2: (1.45, 32.374399999999994), 4: (0.97, 18.56879999999999)}",mushrooms

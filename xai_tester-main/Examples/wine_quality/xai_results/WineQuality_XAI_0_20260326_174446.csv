@@ -1,0 +1,6 @@
+trial_index,ai_label,ground_truth,ai_agrees,response,is_correct,response_time_s,presented_at_s,feat_Vinegar Taint,feat_SO2,feat_pH,feat_Sulphates,feat_Alcohol,xai_Vinegar Taint,xai_SO2,xai_pH,xai_Sulphates,xai_Alcohol
+0,Type2,,,,False,3.76,0.0,0.42,29.0,3.24,0.75,11.7,0.0246,0.00786,0.01686,0.01695,0.0901
+1,Type2,,,,False,0.403,4.187,0.33,37.0,3.18,0.89,11.1,0.06454,0.00453,0.02976,0.04763,0.02934
+2,Type1,,,,False,0.603,5.02,0.5,55.0,3.18,0.68,10.9,-0.01699,-0.00488,0.02448,-0.00251,0.00406
+3,Type2,,,,False,0.655,6.047,0.42,34.0,3.24,0.77,12.1,0.0241,0.00581,0.0155,0.02172,0.12849
+4,Type2,,,,False,0.375,7.123,0.41,42.0,3.24,0.77,12.6,0.02699,0.00358,0.01302,0.02062,0.16977

@@ -1,0 +1,2 @@
+feature_names,target_name,target_options,ordinal_feature_indices,categorical_feature_options,feature_boundaries,dataset_name
+"['Age', 'Capital Gain', 'Married', 'Years of Education', 'Sex']",Income,"['Type 1', 'Type 2']",[],"{2: ['no', 'yes'], 4: ['Female', 'Male']}","{0: (18.0, 69.0), 1: (0.0, 14084.0), 3: (4.0, 15.0)}",adult

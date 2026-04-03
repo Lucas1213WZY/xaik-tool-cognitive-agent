@@ -1,0 +1,2 @@
+appId,a0,v0_min,v0_max,a1,v1_min,v1_max,a2,v2_min,v2_max,a3,v3_min,v3_max,a4,v4_min,v4_max,a5,v5_min,v5_max,a6,v6_min,v6_max,a7,v7_min,v7_max,y,y0,y1
+wine_quality_iter8,fixed acidity,6.1,11.8,Vinegar Taint,0.27,0.84,residual sugar,1.5900000000000007,5.1,chlorides,0.054,0.1260999999999999,SO2,11.0,112.09999999999991,pH,3.06,3.57,Sulphates,0.47,0.93,Alcohol,9.2,12.5,quality,Type 1,Type 2

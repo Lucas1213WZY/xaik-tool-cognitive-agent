@@ -1,0 +1,39 @@
+════════════════════════════════════════════════════════════
+  XAI TESTER — SESSION SUMMARY
+────────────────────────────────────────────────────────────
+  Experiment    : WineQuality_XAI
+  Participant   : 0
+  Trials total  : 20
+  Trials done   : 20
+  Session time  : 123.624 s
+────────────────────────────────────────────────────────────
+
+  PARTICIPANT ACCURACY  (predicted AI label correctly?)
+────────────────────────────────────────────────────────────
+  Correct   : 0 / 20
+  Incorrect : 20 / 20
+  Accuracy  : 0.00000%
+
+  RESPONSE TIMES (seconds)
+────────────────────────────────────────────────────────────
+  Mean   : 5.772
+  Median : 0.637
+  SD     : 13.226
+  Min    : 0.000
+  Max    : 57.924
+
+  PER-LABEL BREAKDOWN
+────────────────────────────────────────────────────────────
+  [Type1]  n=12  acc=0.00000%  mean_RT=7.045 s
+  [Type2]  n=8  acc=0.00000%  mean_RT=3.862 s
+
+  TOP FEATURES BY MEAN |IMPORTANCE|
+────────────────────────────────────────────────────────────
+  Alcohol                         0.273
+  Vinegar Taint                   0.115
+  pH                              0.107
+  Sulphates                       0.086
+  Others                          0.059
+  SO2                             0.047
+
+════════════════════════════════════════════════════════════

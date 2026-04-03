@@ -1,0 +1,70 @@
+graph LR
+    subgraph "XAI Testing Framework"
+        XAITester["🧪 xai_tester<br/>Experiment Control<br/>Trial Generation<br/>Data Recording"]
+        XAIResults["📁 XAI Results<br/>(Summary files)<br/>- Trial metadata<br/>- AI predictions<br/>- Explanations<br/>- Feature importance"]
+    end
+    
+    subgraph "Data Flow"
+        Parser["🔄 Parser<br/>Extract trial-by-trial:<br/>- Features<br/>- AI prediction<br/>- Explanations<br/>- Importance scores"]
+        TrialQueue["📋 Trial Queue<br/>Parsed instances<br/>ready for simulation"]
+    end
+    
+    subgraph "Cognitive User Simulation"
+        UserSim["👥 user_simulation<br/>Generate human-like responses<br/>Trial Generator | Session Generator<br/>Parameter Sampler"]
+        
+        subgraph "User-Selected Reasoning Path"
+            UserChoice["👤 User Selection<br/>Choose CoAX or CoXAM<br/>(Manual per trial)"]
+        end
+        
+        subgraph "Cognitive Models"
+            CRAgent["🟦 cr_agent<br/>Cognitive Router (CoXAM)<br/>forward_meta_router<br/>counterfactual_meta_router"]
+            ReasoningStrats["📚 reasoning_strategies<br/>CoAX | CoXAM strategies<br/>💾 core/memory"]
+        end
+        
+        subgraph "Processing Infrastructure"
+            DataLoaders["📊 data_loaders<br/>Process explanations<br/>Normalize features"]
+        end
+        
+        ResponseBuffer["📤 Response Buffer<br/>- Human-like decision<br/>- Confidence<br/>- Reasoning basis<br/>- Response time"]
+    end
+    
+    subgraph "Output & Recording"
+        ResponseParser["🔄 Response Parser<br/>Format for xai_tester:<br/>- Decision (label)<br/>- Correctness<br/>- Response time<br/>- Trial metadata"]
+        CSVOutput["📊 CSV Output<br/>Append row:<br/>trial_id, decision,<br/>correctness, rt,"]
+        XAIRecorder["💾 xai_tester Recorder<br/>Aggregate results<br/>Generate summary"]
+    end
+    
+    %% Internal connections
+    UserSim --> UserChoice
+    UserChoice -->|User selects CoXAM| CRAgent
+    UserChoice -->|User selects CoAX| ReasoningStrats
+    CRAgent --> DataLoaders
+    ReasoningStrats --> DataLoaders
+    DataLoaders --> ResponseBuffer
+    ResponseBuffer --> ResponseParser
+    
+    %% External flow
+    XAITester --> XAIResults
+    XAIResults --> Parser
+    Parser --> TrialQueue
+    TrialQueue --> UserSim
+    ResponseParser --> CSVOutput
+    CSVOutput --> XAIRecorder
+    XAIRecorder -.->|Next batch| XAITester
+    
+    %% Styling
+    classDef xaiTest fill:#d35400,stroke:#ba4a00,color:#fff,stroke-width:2px
+    classDef dataflow fill:#95a5a6,stroke:#7f8c8d,color:#fff,stroke-width:2px
+    classDef userSim fill:#e74c3c,stroke:#c0392b,color:#fff,stroke-width:2px
+    classDef userInput fill:#34495e,stroke:#2c3e50,color:#fff,stroke-width:3px
+    classDef reasoning fill:#2ecc71,stroke:#27ae60,color:#fff,stroke-width:2px
+    classDef data fill:#f39c12,stroke:#d68910,color:#fff,stroke-width:2px
+    classDef output fill:#16a085,stroke:#138d75,color:#fff,stroke-width:2px
+    
+    class XAITester,XAIResults xaiTest
+    class Parser,TrialQueue dataflow
+    class UserSim userSim
+    class UserChoice userInput
+    class CRAgent,ReasoningStrats reasoning
+    class DataLoaders data
+    class ResponseBuffer,ResponseParser,CSVOutput,XAIRecorder output
