@@ -115,7 +115,7 @@ The unified memory module (`src/memory/`) consolidates two distinct cognitive me
 ### Pattern 1: CoAX (Exemplar-Based) Memory
 
 ```python
-from src.core.memory import UnifiedMemory, Exemplar
+from src.memory import UnifiedMemory, Exemplar
 import numpy as np
 
 # Create memory with CoAX defaults
@@ -143,7 +143,7 @@ for key, activation, exemplar in results:
 ### Pattern 2: CoXAM (ACT-R-Based) Memory
 
 ```python
-from src.core.memory import UnifiedMemory, Chunk
+from src.memory import UnifiedMemory, Chunk
 
 # Create memory with CoXAM defaults
 memory = UnifiedMemory.create_for_coxam(
@@ -197,7 +197,7 @@ retrieved_actr = memory_actr.retrieve(query)
 
 ```python
 # CoAX custom config
-from src.core.memory import MemoryConfig, UnifiedMemory
+from src.memory import MemoryConfig, UnifiedMemory
 
 config = MemoryConfig(
     backend=MemoryBackend.EXEMPLAR,
@@ -321,7 +321,7 @@ memory_dict["exemplar_1"] = {...}
 
 **New Code:**
 ```python
-from src.core.memory import UnifiedMemory
+from src.memory import UnifiedMemory
 memory = UnifiedMemory.create_for_coax()
 memory.store("exemplar_1", exemplar_object)
 ```
@@ -337,7 +337,7 @@ wm = CombinedMemory()
 
 **New Code:**
 ```python
-from src.core.memory import UnifiedMemory
+from src.memory import UnifiedMemory
 memory = UnifiedMemory.create_for_coxam()
 # Same interface, no other changes needed
 ```

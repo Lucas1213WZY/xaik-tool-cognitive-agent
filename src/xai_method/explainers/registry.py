@@ -1,7 +1,7 @@
 """Plugin registry for explainers."""
 
 from typing import Dict, Any, Type, Callable, Optional
-from ..base.explainer import BaseExplainer
+from ..base import BaseExplainer
 
 
 class ExplainerRegistry:

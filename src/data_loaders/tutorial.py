@@ -20,9 +20,10 @@ def tutorial_coax_explanations():
     from src.data_loaders import UnifiedDataLoader
     
     # Step 1: Create loader from CoAX data
-    loader = UnifiedDataLoader.from_coax(
-        feature_values_file="data/datasets/values.csv",
-        metadata_file="data/datasets/metadata.csv"
+    loader = UnifiedDataLoader.from_assets(
+        source="coax",
+        assets_root="assets",
+        coax_explanation_type="importance",
     )
     
     # Step 2: Get explanations for instances [0, 1, 2]
@@ -50,15 +51,15 @@ def tutorial_coxam_explanations():
     from src.data_loaders import UnifiedDataLoader
     import json
     
-    # Step 1: Create loader from CoXAM data (includes participant trials)
-    loader = UnifiedDataLoader.from_coxam(
-        feature_values_file="data/datasets/values.csv",
-        metadata_file="data/datasets/metadata.csv",
-        participant_data_file="data/trials/experiment_trials.csv"
+    # Step 1: Create loader from CoXAM data
+    loader = UnifiedDataLoader.from_assets(
+        source="coxam",
+        assets_root="assets",
     )
     
-    # Step 2: Get the explainer registry
-    registry = loader.get_explainer_registry()
+    # Step 2: Get the XAI method registry
+    from src.xai_method import get_registry
+    registry = get_registry()
     
     # Step 3: List available explainers
     available = registry.list_available()
@@ -119,9 +120,10 @@ def tutorial_comparison():
     print("\n1. CoAX Pattern (Pre-computed Explanations)")
     print("-" * 70)
     
-    loader_coax = UnifiedDataLoader.from_coax(
-        feature_values_file="data/datasets/values.csv",
-        metadata_file="data/datasets/metadata.csv"
+    loader_coax = UnifiedDataLoader.from_assets(
+        source="coax",
+        assets_root="assets",
+        coax_explanation_type="importance",
     )
     
     # Direct access to CSV-stored explanations
@@ -135,14 +137,14 @@ def tutorial_comparison():
     print("\n2. CoXAM Pattern (On-Demand Model Interpretation)")
     print("-" * 70)
     
-    loader_coxam = UnifiedDataLoader.from_coxam(
-        feature_values_file="data/datasets/values.csv",
-        metadata_file="data/datasets/metadata.csv",
-        participant_data_file="data/trials/experiment_trials.csv"
+    loader_coxam = UnifiedDataLoader.from_assets(
+        source="coxam",
+        assets_root="assets",
     )
     
     # Model-based explanations via registry
-    registry = loader_coxam.get_explainer_registry()
+    from src.xai_method import get_registry
+    registry = get_registry()
     print(f"  • Access method: registry.create() then .apply()")
     print(f"  • Source: Model analysis algorithms")
     print(f"  • Speed: ⏱️  Depends on algorithm complexity")
@@ -182,12 +184,13 @@ def tutorial_mixed_access():
     them with on-demand model interpretations.
     """
     from src.data_loaders import UnifiedDataLoader
-    from src.data_loaders.base import BaseExplainer
+    from src.xai_method import BaseExplainer
     
     # Load CoAX data
-    loader = UnifiedDataLoader.from_coax(
-        feature_values_file="data/datasets/values.csv",
-        metadata_file="data/datasets/metadata.csv"
+    loader = UnifiedDataLoader.from_assets(
+        source="coax",
+        assets_root="assets",
+        coax_explanation_type="importance",
     )
     
     print("\n1. Original CoAX explanations:")
@@ -196,7 +199,8 @@ def tutorial_mixed_access():
     
     # Get the registry and register a custom explainer
     print("\n2. Register a custom explainer:")
-    registry = loader.get_explainer_registry()
+    from src.xai_method import get_registry
+    registry = get_registry()
     
     class CustomExplainer(BaseExplainer):
         """Example custom explainer."""
@@ -232,10 +236,9 @@ def tutorial_filtering():
     from src.data_loaders import UnifiedDataLoader
     
     # Load data
-    loader = UnifiedDataLoader.from_coxam(
-        feature_values_file="data/datasets/values.csv",
-        metadata_file="data/datasets/metadata.csv",
-        participant_data_file="data/trials/experiment_trials.csv"
+    loader = UnifiedDataLoader.from_assets(
+        source="coxam",
+        assets_root="assets",
     )
     
     print("\nFiltering examples:")

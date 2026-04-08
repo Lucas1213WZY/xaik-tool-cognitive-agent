@@ -4,7 +4,7 @@ from typing import Dict, List, Any, Union
 import json
 import numpy as np
 import pandas as pd
-from ..base.explainer import BaseExplainer
+from ..base import BaseExplainer
 
 
 class DecisionTreeExplainer(BaseExplainer):

@@ -8,7 +8,7 @@ Copy-paste templates and common usage patterns
 # IMPORTS
 # ============================================================================
 
-from src.core.memory import (
+from src.memory import (
     UnifiedMemory, MemoryConfig, MemoryBackend,
     Exemplar, Chunk, ReasoningContext
 )

@@ -90,7 +90,7 @@ src/reasoning_strategies/
 ### Key Integration Points
 
 #### Memory API Usage
-✅ Uses actual `src.core.memory` API:
+✅ Uses actual `src.memory` API:
 - `UnifiedMemory(MemoryConfig)` - Factory instantiation
 - `memory.retrieve(query, k=5)` - Returns `List[Tuple[key, activation_score, exemplar]]`
 - `memory.get_exemplar_memory().get_exemplars()` - Access all exemplars

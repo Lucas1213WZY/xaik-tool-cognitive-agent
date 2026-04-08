@@ -106,7 +106,7 @@ Common Functionality:
 5. MODULE STRUCTURE
 ====================
 
-src/data_loaders/explainers/
+src/xai_method/explainers/
 
 ├── __init__.py [UPDATED]
 │   └─ Imports & exports AttributionExplainer + 8 implementations
@@ -205,7 +205,7 @@ New Methods (from AttributionExplainer):
 
 Dependencies Module (dependencies.py):
 
-  from src.data_loaders.explainers.dependencies import (
+  from src.xai_method.explainers.dependencies import (
     check_requirements,
     get_installation_instructions,
     print_dependency_report

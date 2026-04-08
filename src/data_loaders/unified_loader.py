@@ -6,10 +6,9 @@ import pandas as pd
 import numpy as np
 
 from .sources import CoAXDataSource, CoXAMDataSource
-from .explainers import ExplainerRegistry, get_registry
 from .normalizers import MinMaxNormalizer, ZScoreNormalizer
 from .filters import FilterBuilder
-from .base import BaseDataSource, BaseExplainer, BaseNormalizer
+from .base import BaseDataSource, BaseNormalizer
 
 
 class UnifiedDataLoader:
@@ -20,15 +19,15 @@ class UnifiedDataLoader:
     - Plugin-based architecture for extensibility
     - Composable filters (by_app, by_participant, by_condition, etc.)
     - Built-in normalization (MinMax, ZScore, custom)
-    - Registry-based explainer management
+    - Loaded explanation-table access; XAI methods live in src.xai_method
     - Consistent interface across different data sources
     
     Example:
         # Load CoAX data
         loader = UnifiedDataLoader.from_coax(
-            feature_file="values.csv",
-            metadata_file="metadata.csv",
-            prediction_file="predictions.csv"
+            feature_file="assets/data/coax/values.csv",
+            metadata_file="assets/data/coax/metadata.csv",
+            prediction_file="assets/data/coax/none.csv"
         )
         
         # Apply filters
@@ -37,27 +36,25 @@ class UnifiedDataLoader:
         # Get data
         features, predictions = loader.get_instances([1, 2, 3])
         
-        # Use explainers
-        registry = loader.get_explainer_registry()
+        # Use XAI methods
+        from src.xai_method import get_registry
+        registry = get_registry()
         lr_exp = registry.create('logistic_regression', 
             explanation_df=lr_df, metadata_df=metadata_df, 
             app_id="wine_quality", model_name="mlp")
     """
 
     def __init__(self, data_source: BaseDataSource, 
-                 normalizer: BaseNormalizer = None,
-                 explainer_registry: ExplainerRegistry = None):
+                 normalizer: BaseNormalizer = None):
         """
         Initialize unified loader.
         
         Args:
             data_source: Instance of BaseDataSource (CoAXDataSource, CoXAMDataSource, etc.)
             normalizer: Feature normalizer (defaults to MinMaxNormalizer)
-            explainer_registry: Explainer registry (defaults to global registry)
         """
         self.data_source = data_source
         self.normalizer = normalizer or MinMaxNormalizer()
-        self.explainer_registry = explainer_registry or get_registry()
         self.filter_builder = FilterBuilder()
         self.explanation_tables: Dict[str, pd.DataFrame] = {}
 
@@ -316,29 +313,6 @@ class UnifiedDataLoader:
         """Get explanation data."""
         return self.data_source.get_explanations(instance_ids)
 
-    # ===================== Explainer Management =====================
-
-    def get_explainer_registry(self) -> ExplainerRegistry:
-        """Get the explainer registry for creating/managing explainers."""
-        return self.explainer_registry
-
-    def create_explainer(self, explainer_type: str, **kwargs) -> BaseExplainer:
-        """
-        Create an explainer instance.
-        
-        Args:
-            explainer_type: Type of explainer ('decision_tree', 'logistic_regression', etc.)
-            **kwargs: Arguments passed to explainer constructor
-            
-        Returns:
-            Instantiated explainer
-        """
-        return self.explainer_registry.create(explainer_type, **kwargs)
-
-    def register_explainer(self, name: str, explainer_class, aliases: list = None) -> None:
-        """Register a custom explainer type."""
-        self.explainer_registry.register(name, explainer_class, aliases)
-
     # ===================== CoXAM-Specific Methods =====================
 
     def get_participant_trials(self, participant_id: int, phase: str = None) -> pd.DataFrame:
@@ -386,10 +360,6 @@ class UnifiedDataLoader:
             return []
         return self.data_source.metadata_df['appId'].unique().tolist()
 
-    def list_explainers(self) -> List[str]:
-        """List available explainer types."""
-        return self.explainer_registry.list_available()
-
     def list_explanation_tables(self) -> List[str]:
         """List loaded explanation table names (assets mode)."""
         return sorted(self.explanation_tables.keys())
@@ -408,85 +378,6 @@ class UnifiedDataLoader:
             available = self.list_explanation_tables()
             raise ValueError(f"Explanation table '{name}' not available. Available: {available}")
         return self.explanation_tables[name]
-
-    def create_coxam_explainer(self, explainer_type: str,
-                               app_id: str,
-                               model_name: str,
-                               **kwargs) -> BaseExplainer:
-        """
-        Create a CoXAM explainer from loaded assets explanation tables.
-
-        Args:
-            explainer_type: 'decision_tree' or 'logistic_regression'
-            app_id: Dataset appId
-            model_name: Model name (e.g. 'mlp', 'xgboost')
-            **kwargs: Extra kwargs (e.g. depth=3, variant='sparse')
-
-        Returns:
-            Instantiated explainer
-        """
-        key = explainer_type.lower().strip()
-        if key not in {"decision_tree", "logistic_regression"}:
-            raise ValueError("explainer_type must be 'decision_tree' or 'logistic_regression'")
-
-        explanation_df = self.get_explanation_table(key)
-        if "model" in explanation_df.columns:
-            explanation_df = explanation_df[explanation_df["model"] == model_name]
-
-        if key == "decision_tree" and "depth" in kwargs and "depth" in explanation_df.columns:
-            explanation_df = explanation_df[explanation_df["depth"] == kwargs["depth"]]
-        if key == "logistic_regression" and "variant" in kwargs and "variant" in explanation_df.columns:
-            explanation_df = explanation_df[explanation_df["variant"] == kwargs["variant"]]
-
-        if explanation_df.empty:
-            raise ValueError(
-                f"No rows found for explainer={key}, app_id={app_id}, model_name={model_name}, filters={kwargs}"
-            )
-
-        return self.create_explainer(
-            key,
-            explanation_df=explanation_df,
-            metadata_df=self.get_metadata(),
-            app_id=app_id,
-            model_name=model_name,
-            **kwargs
-        )
-
-    def get_coxam_xai_predictions(self,
-                                  instance_ids: List[int],
-                                  explainer_type: str,
-                                  app_id: str,
-                                  model_name: str,
-                                  **kwargs) -> List[Any]:
-        """
-        Generate CoXAM XAI predictions by applying a CoXAM explainer to instances.
-
-        This validates that explanation tables are loaded and that predictions are
-        produced by the selected explainer (DT/LR), not by the base model output CSV.
-
-        Args:
-            instance_ids: Instance IDs to evaluate
-            explainer_type: 'decision_tree' or 'logistic_regression'
-            app_id: Dataset appId
-            model_name: Model name, e.g. 'mlp' or 'xgboost'
-            **kwargs: Explainer-specific filters, e.g. depth=3 or variant='dense'
-
-        Returns:
-            List of explainer outputs:
-            - decision_tree: list of dicts with probs/class
-            - logistic_regression: list of probabilities
-        """
-        if not isinstance(self.data_source, CoXAMDataSource):
-            raise AttributeError("get_coxam_xai_predictions is only available for CoXAM data source")
-
-        explainer = self.create_coxam_explainer(
-            explainer_type=explainer_type,
-            app_id=app_id,
-            model_name=model_name,
-            **kwargs
-        )
-        raw_features = self.get_features(instance_ids, normalize=False)
-        return explainer.apply_batch(raw_features)
 
     # ===================== Utility Methods =====================
 

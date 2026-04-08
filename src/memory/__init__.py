@@ -1,30 +1,50 @@
 """
-Core module - Central abstractions for cognitive agent reasoning.
+Memory package public API.
 
-Provides unified interfaces for:
-  - Memory management (exemplar and ACT-R backends)
-  - Reasoning strategy orchestration
-  - Configuration management
+Import memory types from this package root:
+
+    from src.memory import UnifiedMemory, MemoryConfig, Exemplar
 """
 
-from .memory import (
-    UnifiedMemory,
-    MemoryConfig,
+from .interface import (
+    MemoryInterface,
     MemoryBackend,
     Exemplar,
     Chunk,
     ReasoningContext,
-    ExemplarMemory,
-    ACTRMemory,
+    ActivationFunction,
+    SimilarityFunction,
+)
+from .unified_memory import UnifiedMemory, MemoryConfig
+from .exemplar_memory import ExemplarMemory
+from .actr_memory import ACTRMemory
+from .utils import (
+    euclidean_distance,
+    cosine_similarity,
+    temporal_decay,
+    base_level_learning,
+    compute_retrieval_latency,
+    normalize_probabilities,
+    compute_chunk_similarity,
 )
 
 __all__ = [
     "UnifiedMemory",
     "MemoryConfig",
-    "MemoryBackend",
+    "ExemplarMemory",
+    "ACTRMemory",
+    "MemoryInterface",
+    "ActivationFunction",
+    "SimilarityFunction",
     "Exemplar",
     "Chunk",
     "ReasoningContext",
-    "ExemplarMemory",
-    "ACTRMemory",
+    "MemoryBackend",
+    "euclidean_distance",
+    "cosine_similarity",
+    "temporal_decay",
+    "base_level_learning",
+    "compute_retrieval_latency",
+    "normalize_probabilities",
+    "compute_chunk_similarity",
 ]

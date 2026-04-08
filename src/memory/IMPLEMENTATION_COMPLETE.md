@@ -53,7 +53,7 @@ src/memory/
 
 ### CoAX Memory
 ```python
-from src.core.memory import UnifiedMemory, Exemplar
+from src.memory import UnifiedMemory, Exemplar
 import numpy as np
 
 memory = UnifiedMemory.create_for_coax(decay_param=0.3)
@@ -65,7 +65,7 @@ results = memory.retrieve(query_features, k=5)
 
 ### CoXAM Memory
 ```python
-from src.core.memory import UnifiedMemory, Chunk
+from src.memory import UnifiedMemory, Chunk
 
 memory = UnifiedMemory.create_for_coxam(wm_capacity=6, retrieval_threshold=-1.5)
 chunk = Chunk(chunk_type="feature-weight", 

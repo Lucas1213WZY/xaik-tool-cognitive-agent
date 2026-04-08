@@ -9,7 +9,7 @@ This demonstrates all available explainers:
 
 import numpy as np
 from src.data_loaders import UnifiedDataLoader
-from src.data_loaders.explainers import get_registry
+from src.xai_method import get_registry
 
 # ==============================================================================
 # PART 1: Model-Agnostic Explainers (No Special Model Required)
@@ -217,14 +217,16 @@ def example_with_unified_loader():
     print("="*70)
     
     try:
-        # Load CoAX data
-        loader = UnifiedDataLoader.from_coax(
-            feature_values_file="src/coax/datasets/wine_quality/values.csv",
-            metadata_file="src/coax/datasets/wine_quality/metadata.csv"
+        # Load CoAX data from the standardized assets directory
+        loader = UnifiedDataLoader.from_assets(
+            source="coax",
+            assets_root="assets",
+            app_id="wine_quality",
+            coax_explanation_type="importance",
         )
         
         # Get available explainers
-        registry = loader.get_explainer_registry()
+        registry = get_registry()
         available = registry.list_available()
         
         print(f"\nAvailable Explainers in Registry:")

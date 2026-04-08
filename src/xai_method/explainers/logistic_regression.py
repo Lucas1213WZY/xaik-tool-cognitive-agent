@@ -4,7 +4,7 @@ from typing import Dict, List, Any, Union
 from collections import OrderedDict
 import numpy as np
 import pandas as pd
-from ..base.explainer import BaseExplainer
+from ..base import BaseExplainer
 
 
 class LogisticRegressionExplainer(BaseExplainer):

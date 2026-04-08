@@ -18,11 +18,11 @@ def example_coax_loading():
     print("Example 1: Loading CoAX Synthetic Data")
     print("=" * 60)
     
-    # Create loader from CoAX CSV files
-    loader = UnifiedDataLoader.from_coax(
-        feature_file="src/coax/data/values.csv",
-        metadata_file="src/coax/data/metadata.csv",
-        prediction_file="src/coax/data/predictions.csv"
+    # Create loader from the standardized assets directory
+    loader = UnifiedDataLoader.from_assets(
+        source="coax",
+        assets_root="assets",
+        coax_explanation_type="importance",
     )
     
     # Get summary
@@ -48,12 +48,10 @@ def example_coxam_loading():
     print("Example 2: Loading CoXAM Experiment Data")
     print("=" * 60)
     
-    # Create loader from CoXAM CSV files
-    loader = UnifiedDataLoader.from_coxam(
-        feature_file="src/coxam/datasets/values.csv",
-        metadata_file="src/coxam/datasets/metadata.csv",
-        participant_file="src/coxam/datasets/wine_quality.csv",
-        prediction_file="src/coxam/datasets/predictions.csv"
+    # Create loader from the standardized assets directory
+    loader = UnifiedDataLoader.from_assets(
+        source="coxam",
+        assets_root="assets",
     )
     
     # Get summary
@@ -101,14 +99,14 @@ def example_filtering():
 # Example 4: Explainer usage
 def example_explainers():
     """Example: Create and use explainers."""
-    from src.data_loaders import ExplainerRegistry, DecisionTreeExplainer, LogisticRegressionExplainer
+    from src.xai_method import get_registry
     
     print("\n" + "=" * 60)
     print("Example 4: Explainer Management")
     print("=" * 60)
     
     # Get global registry
-    registry = ExplainerRegistry()
+    registry = get_registry()
     
     print(f"\nRegistry initialized")
     print(f"Available explainer types: {registry.list_available()}")
@@ -133,9 +131,9 @@ def example_full_workflow():
     # Step 1: Create loader
     print("\n[1] Creating UnifiedDataLoader for CoAX...")
     try:
-        loader = UnifiedDataLoader.from_coax(
-            feature_file="src/coax/data/values.csv",
-            metadata_file="src/coax/data/metadata.csv"
+        loader = UnifiedDataLoader.from_assets(
+            source="coax",
+            assets_root="assets",
         )
         print(f"    Loaded: {loader}")
         
@@ -154,10 +152,11 @@ def example_full_workflow():
         except Exception as e:
             print(f"    (Instance retrieval requires actual CSV files)")
         
-        # Step 4: Explainers
-        print("\n[4] Using explainers...")
-        explainers = loader.list_explainers()
-        print(f"    Available explainers: {explainers}")
+        # Step 4: XAI methods
+        print("\n[4] Using XAI methods...")
+        from src.xai_method import get_registry
+        explainers = get_registry().list_available()
+        print(f"    Available XAI methods: {explainers}")
         
         print("\n✓ Full workflow completed successfully!")
         
@@ -180,16 +179,16 @@ def print_api_reference():
     
     # From CoAX data
     loader = UnifiedDataLoader.from_coax(
-        feature_file="values.csv",
-        metadata_file="metadata.csv",
-        prediction_file="predictions.csv"
+        feature_file="assets/data/coax/values.csv",
+        metadata_file="assets/data/coax/metadata.csv",
+        prediction_file="assets/data/coax/none.csv"
     )
     
     # From CoXAM data
     loader = UnifiedDataLoader.from_coxam(
-        feature_file="values.csv",
-        metadata_file="metadata.csv",
-        participant_file="trials.csv"
+        feature_file="assets/data/coxam/values.csv",
+        metadata_file="assets/data/coxam/metadata.csv",
+        prediction_file="assets/data/coxam/none.csv"
     )
     
     # From custom source
@@ -227,7 +226,8 @@ def print_api_reference():
     ───────────
     
     # Get registry
-    registry = loader.get_explainer_registry()
+    from src.xai_method import get_registry
+    registry = get_registry()
     
     # List available
     explainers = registry.list_available()

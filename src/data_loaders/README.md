@@ -10,11 +10,11 @@ The unified data loader system provides a **single, consistent API** for accessi
 
 ### Key Features
 
-- **🔌 Plugin Architecture**: Register custom data sources, explainers, and normalizers
+- **🔌 Plugin Architecture**: Register custom data sources and normalizers
 - **🎯 Unified API**: Same interface for CoAX, CoXAM, and custom data
 - **🔗 Composable Filters**: Chain multiple filter conditions (`by_app()`, `by_participant()`, etc.)
 - **📊 Built-in Normalizers**: Min-Max, Z-Score, and custom normalization strategies
-- **🧠 Explainer Registry**: Extensible system for model explainers (DT, LR, SHAP, LIME, etc.)
+- **🧠 XAI Integration**: Load explanation tables that `src.xai_method` can turn into explainers
 - **♻️ Zero Duplication**: Single source of truth for all data loading logic
 
 ---
@@ -28,17 +28,11 @@ src/data_loaders/
 │
 ├── base/                          # Abstract base classes
 │   ├── data_source.py             # BaseDataSource
-│   ├── explainer.py               # BaseExplainer
 │   └── normalizer.py              # BaseNormalizer
 │
 ├── sources/                       # Data source adapters
 │   ├── coax_adapter.py            # CoAXDataSource
 │   └── coxam_adapter.py           # CoXAMDataSource
-│
-├── explainers/                    # Explainer implementations
-│   ├── registry.py                # ExplainerRegistry (plugin system)
-│   ├── decision_tree.py           # DecisionTreeExplainer
-│   └── logistic_regression.py     # LogisticRegressionExplainer
 │
 ├── normalizers/                   # Feature normalizers
 │   ├── minmax.py                  # MinMaxNormalizer
@@ -57,7 +51,8 @@ src/data_loaders/
 ### 1. Install/Import
 
 ```python
-from src.data_loaders import UnifiedDataLoader, DecisionTreeExplainer, FilterBuilder
+from src.data_loaders import UnifiedDataLoader, FilterBuilder
+from src.xai_method import DecisionTreeExplainer
 ```
 
 ### 2. Load Data
@@ -65,16 +60,16 @@ from src.data_loaders import UnifiedDataLoader, DecisionTreeExplainer, FilterBui
 ```python
 # CoAX synthetic data
 loader = UnifiedDataLoader.from_coax(
-    feature_file="values.csv",
-    metadata_file="metadata.csv",
-    prediction_file="predictions.csv"
+    feature_file="assets/data/coax/values.csv",
+    metadata_file="assets/data/coax/metadata.csv",
+    prediction_file="assets/data/coax/none.csv"
 )
 
-# CoXAM experiment data (includes participant trials)
+# CoXAM experiment data
 loader = UnifiedDataLoader.from_coxam(
-    feature_file="values.csv",
-    metadata_file="metadata.csv",
-    participant_file="wine_quality.csv"
+    feature_file="assets/data/coxam/values.csv",
+    metadata_file="assets/data/coxam/metadata.csv",
+    prediction_file="assets/data/coxam/none.csv"
 )
 ```
 
@@ -107,11 +102,12 @@ filter_builder.by_xai_type("importance")
 loader.apply_filter(filter_builder)
 ```
 
-### 5. Use Explainers
+### 5. Use XAI Methods
 
 ```python
-# Get explainer registry
-registry = loader.get_explainer_registry()
+# Get XAI method registry
+from src.xai_method import get_registry
+registry = get_registry()
 
 # Create Decision Tree explainer
 dt_exp = registry.create(
@@ -144,7 +140,8 @@ loader = UnifiedDataLoader.from_custom(data_source)
 # Core methods
 features, predictions = loader.get_instances(ids, normalize=True)
 loader.apply_filter(filter_builder)
-registry = loader.get_explainer_registry()
+from src.xai_method import get_registry
+registry = get_registry()
 summary = loader.get_summary()
 ```
 
@@ -254,7 +251,7 @@ loader = UnifiedDataLoader.from_custom(source)
 ### Custom Explainer
 
 ```python
-from src.data_loaders.base import BaseExplainer
+from src.xai_method import BaseExplainer
 from src.data_loaders import UnifiedDataLoader
 
 class LIMEExplainer(BaseExplainer):
@@ -271,7 +268,8 @@ class LIMEExplainer(BaseExplainer):
 
 # Register it
 loader = UnifiedDataLoader.from_coax(...)
-registry = loader.get_explainer_registry()
+from src.xai_method import get_registry
+registry = get_registry()
 registry.register('lime', LIMEExplainer)
 
 # Use it
@@ -314,14 +312,10 @@ loader = UnifiedDataLoader.from_coax(
 | `get_explanations()` | Get explanation data |
 | `filter()` | Create filter builder |
 | `apply_filter()` | Apply filters to data |
-| `get_explainer_registry()` | Get explainer registry |
-| `create_explainer()` | Create explainer instance |
-| `register_explainer()` | Register custom explainer |
 | `get_participant_trials()` | Get CoXAM participant trials |
 | `get_participant_ids()` | Get CoXAM participant list |
 | `get_summary()` | Get data summary |
 | `list_apps()` | List available app IDs |
-| `list_explainers()` | List available explainers |
 
 ### FilterBuilder Methods
 
@@ -366,10 +360,9 @@ src/coxam/utils.py               # LogisticRegressionInterpreter
 
 ### After (Unified)
 ```
-src/data_loaders/                # Single unified layer
+src/data_loaders/                # Single unified data layer
 ├── unified_loader.py            # UnifiedDataLoader API
 ├── sources/                      # Pluggable data sources
-├── explainers/                   # Pluggable explainers
 ├── normalizers/                  # Pluggable normalizers
 └── filters/                      # Composable filters
 ```
@@ -377,7 +370,7 @@ src/data_loaders/                # Single unified layer
 **Benefits:**
 - ✅ Single source of truth
 - ✅ 90%+ less code duplication
-- ✅ Easy to add SHAP, LIME, custom explainers
+- ✅ XAI methods are isolated in `src/xai_method`
 - ✅ Consistent API across all frameworks
 - ✅ Composable, chainable filters
 - ✅ In-depth documentation and examples
@@ -392,13 +385,9 @@ src/data_loaders/                # Single unified layer
 | `unified_loader.py` | 350+ | Core API |
 | `base/__init__.py` | 10 | Base exports |
 | `base/data_source.py` | 60 | Abstract DataSource |
-| `base/explainer.py` | 50 | Abstract Explainer |
 | `base/normalizer.py` | 40 | Abstract Normalizer |
 | `sources/coax_adapter.py` | 250+ | CoAX data source |
 | `sources/coxam_adapter.py` | 250+ | CoXAM data source |
-| `explainers/registry.py` | 80 | Plugin registry |
-| `explainers/decision_tree.py` | 200+ | DT explainer |
-| `explainers/logistic_regression.py` | 250+ | LR explainer |
 | `normalizers/minmax.py` | 50 | Min-Max normalizer |
 | `normalizers/zscore.py` | 50 | Z-Score normalizer |
 | `filters/filter_builder.py` | 180+ | Filter system |
@@ -418,7 +407,7 @@ scaled_features = loader.scale_feature_values(ids)
 
 # New way
 from src.data_loaders import UnifiedDataLoader
-loader = UnifiedDataLoader.from_coax("values.csv", "metadata.csv", "predictions.csv")
+loader = UnifiedDataLoader.from_assets(source="coax", assets_root="assets")
 features = loader.get_features(ids, normalize=True)
 ```
 
@@ -432,7 +421,8 @@ dt_exp = DecisionTreeInterpreter(dt_df, metadata_df, app_id, model_name)
 # New way
 from src.data_loaders import UnifiedDataLoader
 loader = UnifiedDataLoader.from_coxam(...)
-registry = loader.get_explainer_registry()
+from src.xai_method import get_registry
+registry = get_registry()
 dt_exp = registry.create('decision_tree', explanation_df=dt_df, metadata_df=metadata_df, ...)
 ```
 
@@ -482,4 +472,4 @@ Part of xaik-tool-cognitive-agent project.
 For issues, questions, or extensions:
 1. Check `examples.py` for usage patterns
 2. Review base classes in `base/` for extension points
-3. See existing implementations in `sources/`, `explainers/`, `normalizers/`
+3. See existing implementations in `sources/`, `normalizers/`, and `src/xai_method/explainers/`

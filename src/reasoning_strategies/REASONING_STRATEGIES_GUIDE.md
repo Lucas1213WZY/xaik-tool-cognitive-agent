@@ -43,11 +43,11 @@ src/reasoning_strategies/
 ## API Integration with Memory Module
 
 ### Memory Module API
-The strategies now use the actual `src.core.memory` API:
+The strategies now use the actual `src.memory` API:
 
 ```python
-from src.core.memory import UnifiedMemory, MemoryConfig, Exemplar
-from src.core.memory.utils import euclidean_distance, normalize_probabilities
+from src.memory import UnifiedMemory, MemoryConfig, Exemplar
+from src.memory import euclidean_distance, normalize_probabilities
 
 # Create memory with CoAX backend
 config = MemoryConfig.coax_defaults()
@@ -104,7 +104,7 @@ for key, activation_score, exemplar in results:
 
 #### 3. Utility Functions
 ```python
-from src.core.memory.utils import (
+from src.memory import (
     euclidean_distance,
     normalize_probabilities,
     temporal_decay,
@@ -125,7 +125,7 @@ probs = normalize_probabilities(label_strengths)
 
 ```python
 from src.reasoning_strategies import SensitiveFeatures, StrategyConfig, StrategyType
-from src.core.memory import Exemplar
+from src.memory import Exemplar
 import numpy as np
 
 # Create strategy
@@ -247,7 +247,7 @@ extra_params={
 
 ### Memory Backend Selection
 ```python
-from src.core.memory import MemoryConfig, MemoryBackend, UnifiedMemory
+from src.memory import MemoryConfig, MemoryBackend, UnifiedMemory
 
 # For CoAX strategies: Use ExemplarMemory backend
 coax_config = MemoryConfig(

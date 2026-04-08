@@ -15,7 +15,8 @@
                ├── uses: 🧠 memory/
                └── uses: 🤖 models/
     
-💾 data_loaders/            ← Data processing (shared: Explainers, Normalizers, Filters)
+💾 data_loaders/            ← Data processing (sources, normalizers, filters)
+🧠 xai_method/             ← XAI methods (explainers, attribution, registry)
 ```
 
 ---
@@ -69,22 +70,26 @@ src/
 │       ├── mlp/
 │       └── xgboost/
 │
-└── data_loaders/                       ← Layer 1: Data processing (stateless)
-    ├── unified_loader.py               (Main data loading API)
+├── data_loaders/                       ← Layer 1: Data processing (stateless)
+│   ├── unified_loader.py               (Main data loading API)
+│   ├── normalizers/
+│   │   ├── minmax.py
+│   │   └── zscore.py
+│   ├── filters/
+│   │   └── filter_builder.py
+│   └── sources/
+│       ├── coax_adapter.py
+│       └── coxam_adapter.py
+│
+└── xai_method/                         ← Layer 1b: XAI methods
+    ├── base.py                         (BaseExplainer)
+    ├── api.py                          (XAI method helpers)
     ├── explainers/
     │   ├── decision_tree.py
     │   ├── logistic_regression.py
     │   ├── shap_explainer.py
     │   ├── lime_explainer.py
     │   └── ...
-    ├── normalizers/
-    │   ├── minmax.py
-    │   └── zscore.py
-    ├── filters/
-    │   └── filter_builder.py
-    └── sources/
-        ├── coax_adapter.py
-        └── coxam_adapter.py
 ```
 
 ---
@@ -96,25 +101,29 @@ src/
 
 **What it does:**
 - Load datasets from multiple sources
-- Explain features (DT, LR, SHAP, LIME, LOFO)
 - Normalize features (MinMax, Z-Score)
 - Filter and select features
 
 **When to use:**
 - Preparing training/test data
-- Computing feature importance
 - Feature normalization for models
 
 **Quick Example:**
 ```python
-from src.data_loaders import UnifiedDataLoader, ExplainerRegistry
+from src.data_loaders import UnifiedDataLoader
 
-loader = UnifiedDataLoader()
-X_train, y_train = loader.load_dataset('adult')
+loader = UnifiedDataLoader.from_assets(source="coxam", assets_root="assets")
+features, predictions = loader.get_instances([1, 2, 3])
+```
 
-# Get feature importance
-explainer = ExplainerRegistry.get('logistic_regression')
-importances = explainer.explain(X_train, y_train)
+### Layer 1b: XAI Methods - `xai_method/`
+**Purpose:** Create and apply explanation methods independently from data loading.
+
+```python
+from src.xai_method import get_registry
+
+registry = get_registry()
+explainer = registry.create("logistic_regression", ...)
 ```
 
 ---

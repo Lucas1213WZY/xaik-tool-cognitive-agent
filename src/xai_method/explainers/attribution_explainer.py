@@ -8,7 +8,7 @@ Integrated Gradients and other attribution methods.
 from abc import abstractmethod
 from typing import Dict, Any, List, Optional, Tuple, Callable
 import numpy as np
-from ..base.explainer import BaseExplainer
+from ..base import BaseExplainer
 
 
 class AttributionExplainer(BaseExplainer):

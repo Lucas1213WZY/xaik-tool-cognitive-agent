@@ -32,8 +32,8 @@ xaik-tool-cognitive-agent/
 │   ├── reasoning_strategies/     (forward/counterfactual strategies)
 │   ├── models/                   (AI model implementations)
 │   ├── data_loaders/             (data processing)
+│   ├── xai_method/               (XAI methods)
 │   ├── memory/                   (memory systems)
-│   │   ├── memory/              (actual implementations)
 │   └── rl_agents/                (legacy RL agents)
 │
 ├── generate_trials_full.py       ← TRIAL GENERATION API
@@ -63,6 +63,7 @@ from user_simulation import TrialSimulator, SessionGenerator
 - `src.reasoning_strategies` → Reasoning plugins
 - `src.models` → AI models (CoAX & CoXAM)
 - `src.data_loaders` → Data processing
+- `src.xai_method` → XAI methods
 - `src.memory` → Cognitive memory backends
 
 ### 3. **Experiments Layer** (`experiments/`)
@@ -158,7 +159,7 @@ df = generate_trials_from_params_csv(
 ```python
 # Within src modules, import from src
 from src.reasoning_strategies import StrategyRegistry
-from src.memory.memory import UnifiedMemory
+from src.memory import UnifiedMemory
 from src.models import ModelFactory
 from src.data_loaders import UnifiedDataLoader
 ```
