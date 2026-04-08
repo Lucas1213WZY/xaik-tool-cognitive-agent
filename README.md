@@ -19,7 +19,21 @@ xaik-tool-cognitive-agent/
 │   ├── Examples/                 (loan approval and wine quality studies)
 │   └── tests/                    (xai_tester tests)
 │
-├── UI_components_
+├── UI_components
+│
+├── notebooks/                    ← Tutorial notebooks and rendered quickstarts
+│   ├── xai_adapter_quickstart.ipynb
+│   ├── virtual_experiment_executor_quickstart.ipynb
+│   └── simulated_results/
+│
+├── tests/                        ← Integration tests and import/path setup
+│   ├── conftest.py
+│   └── integration/
+│       ├── test_unified_memory.py
+│       ├── test_xai_adapter_api.py
+│       ├── test_models_registry.py
+│       ├── tmp_integration_check_sim.py
+│       └── verify_refactored_models.py
 │
 ├── src/                          ← IMPLEMENTATION (internal)
 │   ├── cognitive_models/     (cognitive models - reasoning strategies & strategy selector)
@@ -32,8 +46,6 @@ xaik-tool-cognitive-agent/
 │   ├── xai_adapter/              (XAI methods: attribution, rules/weights)
 │   └── virtual_experiment_executor/ (API-driven virtual experiment simulation)
 │
-├── generate_trials_full.py       ← TRIAL GENERATION API
-├── generate_trials_from_params.py
 └── README.md                      (this file)
 ```
 
@@ -314,6 +326,21 @@ src/                      ← Don't use directly
 └── virtual_experiment_executor/
 ```
 
+### Layer 5: Tutorials And Tests
+
+```
+notebooks/                 ← Use this for short runnable tutorials
+├── xai_adapter_quickstart.ipynb
+└── virtual_experiment_executor_quickstart.ipynb
+
+tests/                     ← Use this for integration checks
+├── conftest.py
+└── integration/
+    ├── test_unified_memory.py
+    ├── test_xai_adapter_api.py
+    └── test_models_registry.py
+```
+
 ## Contributing
 
 To extend this project:
@@ -322,6 +349,7 @@ To extend this project:
 2. **Trial generation**: Extend `generate_trials_full.py`
 3. **Experiment planner**: Update `experiment_planner_interface/xai_tester/`
 4. **Implementation**: Modify `src/` modules
+5. **Tutorials and tests**: Update `notebooks/` and `tests/`
 
 Always maintain the public/internal separation!
 
