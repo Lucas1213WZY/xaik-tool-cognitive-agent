@@ -28,12 +28,15 @@ xaik-tool-cognitive-agent/
 │   └── examples/                 (runnable examples)
 │
 ├── src/                          ← IMPLEMENTATION (internal)
-│   ├── cr_agent/                (CoXAM orchestration)
-│   ├── reasoning_strategies/     (forward/counterfactual strategies)
+│   ├── reasoning_strategies/     (cognitive reasoning layer)
+│   │   ├── forward/              (CoAX/CoXAM forward strategies)
+│   │   ├── counterfactual/       (CoXAM counterfactual strategies)
+│   │   ├── memory/               (cognitive memory backends)
+│   │   └── cr_agent/             (CoXAM CR agent orchestration)
 │   ├── models/                   (AI model implementations)
-│   ├── data_loaders/             (data processing)
-│   ├── xai_method/               (XAI methods)
-│   ├── memory/                   (memory systems)
+│   ├── data_loaders/             (data processing, XAI dataset CSV parsing)
+│   ├── xai_adapter/              (XAI methods: attribution, rules/weights)
+│   ├── virtual_experiment_executor/ (API-driven virtual experiment simulation)
 │   └── rl_agents/                (legacy RL agents)
 │
 ├── generate_trials_full.py       ← TRIAL GENERATION API
@@ -58,13 +61,16 @@ from user_simulation import TrialSimulator, SessionGenerator
 
 ### 2. **Implementation Layer** (`src/`)
 
-**No changes to imports within `src/`**, but structure is now clearer:
-- `src.cr_agent` → CoXAM orchestration
-- `src.reasoning_strategies` → Reasoning plugins
+**Current internal structure:**
+- `src.reasoning_strategies` → Cognitive reasoning API and strategy registry
+- `src.reasoning_strategies.forward` → CoAX/CoXAM forward reasoning strategies
+- `src.reasoning_strategies.counterfactual` → CoXAM counterfactual strategies
+- `src.reasoning_strategies.memory` → Cognitive memory backends
+- `src.reasoning_strategies.cr_agent` → CoXAM CR agent orchestration
 - `src.models` → AI models (CoAX & CoXAM)
-- `src.data_loaders` → Data processing
-- `src.xai_method` → XAI methods
-- `src.memory` → Cognitive memory backends
+- `src.data_loaders` → Data processing and XAI dataset CSV parsing
+- `src.xai_adapter` → XAI methods (SHAP, LIME, Captum, rules/weights, precomputed wrappers)
+- `src.virtual_experiment_executor` → API-driven virtual experiment simulation
 
 ### 3. **Experiments Layer** (`experiments/`)
 
@@ -159,9 +165,10 @@ df = generate_trials_from_params_csv(
 ```python
 # Within src modules, import from src
 from src.reasoning_strategies import StrategyRegistry
-from src.memory import UnifiedMemory
+from src.reasoning_strategies.memory import UnifiedMemory
 from src.models import ModelFactory
 from src.data_loaders import UnifiedDataLoader
+from src.xai_adapter import create_xai_method
 ```
 
 ## Benefits of This Architecture
@@ -195,7 +202,7 @@ result_df = generate_trials_from_params_csv(
     strategies={0: 'strategy_0', 1: 'strategy_1'},
     XAI_types={0: 'DT', 1: 'LR'},
     training_cog_params={'rt': [-2, 0.5]},
-    param_csv_path='user_simulation/param_config/CoXAM_counterfactual_simulation_cog_param.csv',
+    param_csv_path='assets/param_config/CoXAM_counterfactual_simulation_cog_param.csv',
     mode='participant',
     data_instances=data,
     output_csv='output.csv'
@@ -253,11 +260,15 @@ generate_trials_*         ← Use this for data generation
 
 ```
 src/                      ← Don't use directly
-├── cr_agent/
 ├── reasoning_strategies/
+│   ├── forward/
+│   ├── counterfactual/
+│   ├── memory/
+│   └── cr_agent/
 ├── models/
 ├── data_loaders/
-└── memory/
+├── xai_adapter/
+└── virtual_experiment_executor/
 ```
 
 ## Contributing
