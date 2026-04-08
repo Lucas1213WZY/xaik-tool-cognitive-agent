@@ -21,7 +21,7 @@ xaik-tool-cognitive-agent/
 │
 ├── UI_components
 │
-├── notebooks/                    ← Tutorial notebooks and rendered quickstarts
+├── tutorials/                    ← Tutorial notebooks and rendered quickstarts
 │   ├── xai_adapter_quickstart.ipynb
 │   ├── virtual_experiment_executor_quickstart.ipynb
 │   └── simulated_results/
