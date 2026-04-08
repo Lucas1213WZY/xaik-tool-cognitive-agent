@@ -5,18 +5,18 @@
 ```
 🎯 user_simulation/         ← Start here for human-like response generation
     ├─ CoAX path:
-    │  └── 📚 reasoning_strategies/    (Forward: SensitiveFeatures, SalientFeatures, ImportanceCategorization, AttributionSum)
+    │  └── 📚 cognitive_models/    (Forward: SensitiveFeatures, SalientFeatures, ImportanceCategorization, AttributionSum)
     │      ├── uses: 🧠 memory/
     │      └── uses: 🤖 models/
     │
     └─ CoXAM path:
        └──🟦 cr_agent/                (strategy selection + memory)
-           └── 📚 reasoning_strategies/    (Forward: DTTraversal, LRCalculation, LRHeuristic; CF: ZeroOutLRHeuristic, ChangeDTPath, MemoryBasedCF)
+           └── 📚 cognitive_models/    (Forward: DTTraversal, LRCalculation, LRHeuristic; CF: ZeroOutLRHeuristic, ChangeDTPath, MemoryBasedCF)
                ├── uses: 🧠 memory/
                └── uses: 🤖 models/
     
-💾 data_loaders/            ← Data processing (sources, normalizers, filters)
-🧠 xai_method/             ← XAI methods (explainers, attribution, registry)
+💾 data_loaders/            ← Data processing (sources, normalizers, filters, XAI dataset CSV parsing)
+🔌 xai_adapter/             ← XAI methods (feature attribution, rules vs weights, precomputed wrappers)
 ```
 
 ---
@@ -44,7 +44,7 @@ src/
 │   ├── tests/
 │   └── weights/                        (Pre-trained PPO meta models)
 │
-├── reasoning_strategies/               ← Layer 3b: Reasoning strategy implementations
+├── cognitive_models/               ← Layer 3b: Reasoning strategy implementations
 │   ├── interface.py
 │   ├── registry.py
 │   ├── forward/
@@ -72,6 +72,7 @@ src/
 │
 ├── data_loaders/                       ← Layer 1: Data processing (stateless)
 │   ├── unified_loader.py               (Main data loading API)
+│   ├── xai_dataset.py                  (External XAI dataset CSV parser)
 │   ├── normalizers/
 │   │   ├── minmax.py
 │   │   └── zscore.py
@@ -81,15 +82,23 @@ src/
 │       ├── coax_adapter.py
 │       └── coxam_adapter.py
 │
-└── xai_method/                         ← Layer 1b: XAI methods
-    ├── base.py                         (BaseExplainer)
-    ├── api.py                          (XAI method helpers)
-    ├── explainers/
-    │   ├── decision_tree.py
-    │   ├── logistic_regression.py
-    │   ├── shap_explainer.py
-    │   ├── lime_explainer.py
-    │   └── ...
+├── xai_adapter/                        ← Layer 1b: External XAI library adapters
+│   ├── base.py                         (XAIAdapter, XAIAdapterResult)
+│   ├── api.py                          (engine-based convenience constructors)
+│   ├── registry.py                     (adapter registry)
+│   ├── dataset.py                      (thin precomputed CSV XAI wrapper)
+│   ├── feature_attribution_method/
+│   │   ├── lofo.py
+│   │   ├── shap_kernel.py
+│   │   ├── lime_tabular.py
+│   │   ├── gradient_input.py
+│   │   ├── deep_lift.py
+│   │   ├── integrated_gradients.py
+│   │   └── sklearn_global.py
+│   └── surrogate/
+│       ├── decision_tree.py
+│       └── logistic_regression.py
+│
 ```
 
 ---
@@ -116,17 +125,24 @@ loader = UnifiedDataLoader.from_assets(source="coxam", assets_root="assets")
 features, predictions = loader.get_instances([1, 2, 3])
 ```
 
-### Layer 1b: XAI Methods - `xai_method/`
-**Purpose:** Create and apply explanation methods independently from data loading.
+### Layer 1b: XAI Adapters - `xai_adapter/`
+**Purpose:** Wrap third-party XAI libraries behind one extensible adapter API.
 
 ```python
-from src.xai_method import get_registry
+from src.xai_adapter import create_xai_method
 
-registry = get_registry()
-explainer = registry.create("logistic_regression", ...)
+method = create_xai_method(
+    "lofo",
+    predict_fn=model.predict_proba,
+    background_data=X_train,
+)
+result = method.explain(X_test[:5])
+importances = result.values
 ```
 
----
+Use this layer when you need direct SHAP, LIME, Captum, LOFO, sklearn-style
+feature importance calls, CoXAM rules-vs-weights methods, or a thin wrapper
+around precomputed explanations parsed by `data_loaders.XAIDatasetParser`.
 
 ### Layer 2: AI Models - `models/`
 **Purpose:** Make predictions and store cognitive data.
@@ -167,7 +183,7 @@ explanations = model.explain(X_test)
 
 **Quick Example:**
 ```python
-from src.reasoning_strategies.memory import UnifiedMemory, ACTRMemory
+from src.cognitive_models.memory import UnifiedMemory, ACTRMemory
 
 memory = ACTRMemory()
 # Memory is used internally by reasoning strategies
@@ -175,7 +191,7 @@ memory = ACTRMemory()
 
 ---
 
-### Layer 3b: Reasoning Strategies - `reasoning_strategies/`
+### Layer 3b: Reasoning Strategies - `cognitive_models/`
 **Purpose:** Define how humans reason (CoAX vs CoXAM with integrated memory).
 
 **What it does:**
@@ -190,8 +206,8 @@ memory = ACTRMemory()
 
 **Quick Example:**
 ```python
-from src.reasoning_strategies import StrategyRegistry, DTTraversal
-from src.reasoning_strategies.core.memory import UnifiedMemory
+from src.cognitive_models import StrategyRegistry, DTTraversal
+from src.cognitive_models.memory import UnifiedMemory
 
 # Load strategy with integrated memory
 strategy = DTTraversal(config)
@@ -216,7 +232,7 @@ probs, time, info = strategy.infer(
 - Counterfactual Gym environment
 - Bridge between strategies and user simulation for CoXAM reasoning
 
-**Note:** This layer is **NOT used** for CoAX reasoning. CoAX strategies go directly through `reasoning_strategies/`.
+**Note:** This layer is **NOT used** for CoAX reasoning. CoAX strategies go directly through `cognitive_models/`.
 
 **When to use:**
 - Need dynamic strategy selection in CoXAM path
@@ -225,7 +241,7 @@ probs, time, info = strategy.infer(
 
 **Quick Example:**
 ```python
-from src.cr_agent import CRAgentRunner
+from src.cognitive_models.cr_agent import CRAgentRunner
 
 runner = CRAgentRunner(
     meta_model_path="path/to/meta_model.zip",
@@ -311,8 +327,8 @@ response = simulator.generate_forward_trials(
 
 ### Pattern 2: Custom Strategy + Memory
 ```python
-from src.reasoning_strategies import DTTraversal, StrategyConfig
-from src.reasoning_strategies.core.memory import ACTRMemory
+from src.cognitive_models import DTTraversal, StrategyConfig
+from src.cognitive_models.memory import ACTRMemory
 
 # 1. Create strategy
 config = StrategyConfig(strategy_name='dt_traversal')
@@ -335,7 +351,7 @@ for sample in X_batch:
 
 ### Pattern 3: Meta-Learning with Strategy Selection
 ```python
-from src.cr_agent import run_meta_on_batch, load_forward_strategies
+from src.cognitive_models.cr_agent import run_meta_on_batch, load_forward_strategies
 
 # 1. Load all forward strategies
 strategies = load_forward_strategies()  # {dt, lr_calc, lr_heur}
@@ -389,10 +405,11 @@ session = session_gen.generate_session(
 
 | Layer | Key Principle | Example |
 |-------|---------------|---------|
-| `data_loaders/` | **Stateless** — no memory, just processing | Feature normalization, importance |
+| `data_loaders/` | **Stateless** — no memory, just processing | Feature normalization, XAI dataset CSV parsing |
+| `xai_adapter/` | **Unified XAI methods** — feature attribution, rules vs weights, precomputed wrappers | SHAP, LIME, Captum, CoXAM LR/DT |
 | `models/` | **Unified factory** — CoAX or CoXAM | Model factory with registry |
 | `memory/` | **Integrated infrastructure** — shared by all strategies | ACT-R activation & decay |
-| `reasoning_strategies/` | **Plugins + Memory** — used by both CoAX & CoXAM | DTTraversal (CoXAM), SensitiveFeatures (CoAX) |
+| `cognitive_models/` | **Plugins + Memory** — used by both CoAX & CoXAM | DTTraversal (CoXAM), SensitiveFeatures (CoAX) |
 | `cr_agent/` | **CoXAM-only orchestration** — selects CoXAM strategy | PPO model picks DT vs LR (CoXAM only) |
 | `user_simulation/` | **High-level generation** — both CoAX & CoXAM paths | SessionGenerator with reasoning_model='coxam' or 'coax' |
 
@@ -405,9 +422,10 @@ session = session_gen.generate_session(
 | **Generate responses** | `user_simulation.TrialSimulator` | `.generate_forward_trials()` | CoAX or CoXAM |
 | **Full session** | `user_simulation.SessionGenerator` | `.generate_session()` | CoAX or CoXAM |
 | **Strategy selection** | `cr_agent.run_meta_on_batch()` | Pass meta_model + strategies | **CoXAM only** |
-| **CoAX reasoning** | `reasoning_strategies.SensitiveFeatures` | `.infer()` with memory | CoAX only |
-| **Custom reasoning** | `reasoning_strategies.DTTraversal` | `.infer()` with memory | **CoXAM only** |
+| **CoAX reasoning** | `cognitive_models.SensitiveFeatures` | `.infer()` with memory | CoAX only |
+| **Custom reasoning** | `cognitive_models.DTTraversal` | `.infer()` with memory | **CoXAM only** |
 | **Load data** | `data_loaders.UnifiedDataLoader` | `.load_dataset()` | Shared |
+| **Use XAI method** | `xai_adapter.create_xai_method()` | `.fit()` / `.explain()` | Shared |
 | **Get model** | `models.ModelFactory` | `.create()` | Shared |
 
 ---
@@ -416,22 +434,22 @@ session = session_gen.generate_session(
 
 Memory is **integrated into reasoning strategies** at Layer 3:
 
-**For CoXAM path:** Memory is used through `cr_agent/` → `reasoning_strategies/` → `memory/`
+**For CoXAM path:** Memory is used through `cr_agent/` → `cognitive_models/` → `memory/`
 
 ```python
 # CoXAM: Memory integrated via cr_agent
-from src.cr_agent import CRAgentRunner
+from src.cognitive_models.cr_agent import CRAgentRunner
 
 runner = CRAgentRunner(...)  # Uses cr_agent for strategy selection
 results = runner.run_forward_episode(...)  # Memory handled internally
 ```
 
-**For CoAX path:** Memory is used directly through `reasoning_strategies/` → `memory/`
+**For CoAX path:** Memory is used directly through `cognitive_models/` → `memory/`
 
 ```python
 # CoAX: Memory integrated directly in strategies
-from src.reasoning_strategies import SensitiveFeatures
-from src.reasoning_strategies.memory import UnifiedMemory
+from src.cognitive_models import SensitiveFeatures
+from src.cognitive_models.memory import UnifiedMemory
 
 strategy = SensitiveFeatures(config)
 memory = UnifiedMemory()
@@ -448,7 +466,7 @@ probs, time, info = strategy.infer(
 - `models/` — single predictions only
 
 **Memory located in:**
-- `reasoning_strategies/memory/` — shared infrastructure (ACT-R, Exemplar)
+- `cognitive_models/memory/` — shared infrastructure (ACT-R, Exemplar)
 - `cr_agent/` — preserves & manages memory across strategy selections (CoXAM only)
 - `user_simulation/` — tracks memory across trials for both paths
 
@@ -466,7 +484,7 @@ session = session_gen.generate_session(n_trials=100)
 
 ### For Understanding Human Reasoning
 ```python
-from src.reasoning_strategies import StrategyRegistry
+from src.cognitive_models import StrategyRegistry
 
 strategies = StrategyRegistry.get_all_forward()
 for name, strategy in strategies.items():
@@ -475,7 +493,7 @@ for name, strategy in strategies.items():
 
 ### For Evaluating XAI Impact (CoXAM)
 ```python
-from src.cr_agent import CRAgentRunner
+from src.cognitive_models.cr_agent import CRAgentRunner
 
 runner = CRAgentRunner(...)  # CoXAM-only orchestration
 with_xai = runner.run_forward_episode(..., condition='DT')
@@ -484,7 +502,7 @@ without_xai = runner.run_forward_episode(..., condition='Control')
 
 ### For CoAX Exemplar-Based Reasoning
 ```python
-from src.reasoning_strategies import SensitiveFeatures, SalientFeatures
+from src.cognitive_models import SensitiveFeatures, SalientFeatures
 
 # CoAX strategies used directly (no cr_agent)
 sensitive = SensitiveFeatures(config)
@@ -506,5 +524,6 @@ params = estimator.fit(user_responses, X_features)
 
 - [API_STRUCTURE.md](API_STRUCTURE.md) — Detailed file-level documentation
 - [cr_agent/README.md](cr_agent/README.md) — CoXAM orchestration details
-- [reasoning_strategies/REASONING_STRATEGIES_GUIDE.md](reasoning_strategies/REASONING_STRATEGIES_GUIDE.md) — Strategy specifics
+- [cognitive_models/REASONING_STRATEGIES_GUIDE.md](cognitive_models/REASONING_STRATEGIES_GUIDE.md) — Strategy specifics
 - [data_loaders/README.md](data_loaders/README.md) — Data processing examples
+- [xai_adapter/README.md](xai_adapter/README.md) — SHAP, LIME, Captum adapter API

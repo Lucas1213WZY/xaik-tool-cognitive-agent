@@ -20,8 +20,8 @@ import numpy as np
 import gymnasium as gym
 from gymnasium import spaces
 
-from src.memory import UnifiedMemory, MemoryConfig, MemoryBackend
-from src.reasoning_strategies import StrategyRegistry, StrategyConfig, StrategyType, ReasoningMode
+from src.cognitive_models.memory import UnifiedMemory, MemoryConfig, MemoryBackend
+from src.cognitive_models import StrategyRegistry, StrategyConfig, StrategyType, ReasoningMode
 
 
 @dataclass

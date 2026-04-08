@@ -4,7 +4,7 @@ GUIDE: Using New Reasoning Strategies API with CSV Parameters
 ================================================================================
 
 This guide explains how to use the new unified reasoning strategies API
-from src/reasoning_strategies/ with parameters loaded from your CSV file.
+from src/cognitive_models/ with parameters loaded from your CSV file.
 
 KEY DIFFERENCES: Old API vs. New API
 ================================================================================
@@ -15,7 +15,7 @@ OLD API (consolidated_human_models.py):
   - Parameters embedded in strategy __init__()
   - Memory managed internally per strategy
   
-NEW API (src/reasoning_strategies/):
+NEW API (src/cognitive_models/):
   - Modular, registry-based architecture
   - Config-driven instantiation: strategy = SensitiveFeatures(config)
   - StrategyConfig dataclass encapsulates all parameters
@@ -72,7 +72,7 @@ STEP-BY-STEP USAGE
 ──────────────────────────────
 
   from run_simulation_from_params_v2 import CSVParameterLoaderV2
-  from src.reasoning_strategies.interface import StrategyConfig
+  from src.cognitive_models.interface import StrategyConfig
   
   strategy_name = param_row['Strategy']
   config = CSVParameterLoaderV2.create_strategy_config(param_row, strategy_name)
@@ -83,7 +83,7 @@ STEP-BY-STEP USAGE
 3. INSTANTIATE STRATEGY
 ──────────────────────
 
-  from src.reasoning_strategies.forward import SensitiveFeatures
+  from src.cognitive_models.forward import SensitiveFeatures
   from run_simulation_from_params_v2 import SimpleTimeManager
   
   time_manager = SimpleTimeManager()
@@ -145,7 +145,7 @@ COMPLETE WORKFLOW EXAMPLE
 1. Load parameters from CSV and filter:
 
    from run_simulation_from_params_v2 import CSVParameterLoaderV2, instantiate_strategy_new_api, SimpleTimeManager
-   from src.reasoning_strategies.forward import SensitiveFeatures
+   from src.cognitive_models.forward import SensitiveFeatures
    import pandas as pd
 
    loader = CSVParameterLoaderV2("three datasets strategies.csv")
@@ -246,7 +246,7 @@ All strategies inherit from ReasoningStrategy and implement:
   - get_state(): Export strategy memory state
   - set_state(state): Restore strategy memory state
 
-NEW API STRATEGIES (in src/reasoning_strategies/forward/):
+NEW API STRATEGIES (in src/cognitive_models/forward/):
 
   CoAX Forward Reasoning:
   ──────────────────────
@@ -389,8 +389,8 @@ Old code:
   response = strategy.infer_no_explanation(instance_id, features, ai_pred)
 
 New code:
-  from src.reasoning_strategies.forward import SensitiveFeatures
-  from src.reasoning_strategies.interface import StrategyConfig, ReasoningMode
+  from src.cognitive_models.forward import SensitiveFeatures
+  from src.cognitive_models.interface import StrategyConfig, ReasoningMode
   
   config = StrategyConfig(
       strategy_name="Sensitive Features",
@@ -411,13 +411,13 @@ Key differences:
 FOR MORE INFORMATION
 ================================================================================
 
-See these files in src/reasoning_strategies/:
+See these files in src/cognitive_models/:
   - interface.py: Abstract base class and data structures
   - registry.py: Strategy discovery and registration
   - forward/coax_forward_rs.py: CoAX strategy implementations
   - forward/coxam_forward_rs.py: CoXAM strategy implementations
 
-See these files in src/memory/:
+See these files in src/cognitive_models/memory/:
   - unified_memory.py: Unified memory interface
   - exemplar_memory.py: CoAX exemplar backend
   - actr_memory.py: CoXAM ACT-R inspired backend

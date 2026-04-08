@@ -530,7 +530,7 @@ if __name__ == "__main__":
         strategies={0: 'change_path_dt', 1: 'zero_out_lr_heuristic', ...},
         XAI_types={0: 'DT', 1: 'LR', 2: 'DT+LR'},
         training_cog_params={...},
-        param_csv_path='user_simulation/param_config/CoXAM_counterfactual_simulation_cog_param.csv',
+        param_csv_path='assets/param_config/CoXAM_counterfactual_simulation_cog_param.csv',
         mode='experiment',  # or 'participant' or 'trial'
         output_csv='generated_trials.csv',
         random_seed=42,

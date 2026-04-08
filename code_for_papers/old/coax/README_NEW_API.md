@@ -2,7 +2,7 @@
 
 ## Overview
 
-I've created a set of tools and guides to help you use the **new unified reasoning strategies API** (from `src/reasoning_strategies/`) with parameters loaded from your CSV file (`three datasets strategies.csv`).
+I've created a set of tools and guides to help you use the **new unified reasoning strategies API** (from `src/cognitive_models/`) with parameters loaded from your CSV file (`three datasets strategies.csv`).
 
 ## What I Created
 
@@ -160,7 +160,7 @@ strategy = SensitiveFeatures(k=3, sensitivity=10.0, decay_param=0.5)
 response, time = strategy.infer_no_explanation(features, ai_pred)
 ```
 
-### New API (src/reasoning_strategies/)
+### New API (src/cognitive_models/)
 ```python
 config = StrategyConfig(..., extra_params={'k': 3, 'sensitivity': 10.0})
 strategy = SensitiveFeatures(config)
@@ -253,10 +253,10 @@ If you encounter issues:
 ## For More Information
 
 See these documentation files in `src/`:
-- `src/reasoning_strategies/interface.py` - Abstract base class
-- `src/reasoning_strategies/registry.py` - Strategy registry
-- `src/reasoning_strategies/forward/coax_forward_rs.py` - Strategy implementations
-- `src/memory/__init__.py` - Memory module
+- `src/cognitive_models/interface.py` - Abstract base class
+- `src/cognitive_models/registry.py` - Strategy registry
+- `src/cognitive_models/forward/coax_forward_rs.py` - Strategy implementations
+- `src/cognitive_models/memory/__init__.py` - Memory module
 
 ## Example Output
 

@@ -8,27 +8,21 @@ The XAIK project has been restructured to follow a clear **public API vs. implem
 
 ```
 xaik-tool-cognitive-agent/
-├── user_simulation/              ← PUBLIC API (moved from src/)
-│   ├── __init__.py              (main exports)
-│   ├── trial_simulator.py        (per-trial simulation)
-│   ├── session_generator.py      (multi-trial sessions)
-│   ├── parameter_estimator.py    (extract distributions)
-│   ├── parameter_sampler.py      (sample parameters)
-│   ├── forward_trial_generator.py
-│   ├── distribution_loader.py
-│   ├── utils.py
-│   ├── param_config/             (default parameter files)
+├── experiment_planner_interface/ ← Experiment planner and participant-facing XAI tester (UI + Experiment)
+│   ├── pyproject.toml            (installable xai-tester package)
+│   ├── README.md                 (planner-specific usage docs)
+│   ├── xai_tester/               (human-subject XAI experiment API)
+│   │   ├── control/              (experiment lifecycle: initialise/start/pause/end)
+│   │   ├── design/               (Experiment → Session → Trial hierarchy)
+│   │   ├── io/                   (terminal presenter and data recorder)
+│   │   └── misc/                 (clock and defaults)
+│   ├── Examples/                 (loan approval and wine quality studies)
+│   └── tests/                    (xai_tester tests)
 │
-├── experiments/                  ← USAGE EXAMPLES & RUNNERS (NEW)
-│   ├── __init__.py
-│   ├── experiment_runner.py      (orchestrate experiments)
-│   ├── evaluation.py             (compute metrics)
-│   ├── coax_evaluation.py        (CoAX-specific experiments)
-│   ├── coxam_evaluation.py       (CoXAM-specific experiments)
-│   └── examples/                 (runnable examples)
+├── UI_components_
 │
 ├── src/                          ← IMPLEMENTATION (internal)
-│   ├── reasoning_strategies/     (cognitive reasoning layer)
+│   ├── cognitive_models/     (cognitive models - reasoning strategies & strategy selector)
 │   │   ├── forward/              (CoAX/CoXAM forward strategies)
 │   │   ├── counterfactual/       (CoXAM counterfactual strategies)
 │   │   ├── memory/               (cognitive memory backends)
@@ -36,8 +30,7 @@ xaik-tool-cognitive-agent/
 │   ├── models/                   (AI model implementations)
 │   ├── data_loaders/             (data processing, XAI dataset CSV parsing)
 │   ├── xai_adapter/              (XAI methods: attribution, rules/weights)
-│   ├── virtual_experiment_executor/ (API-driven virtual experiment simulation)
-│   └── rl_agents/                (legacy RL agents)
+│   └── virtual_experiment_executor/ (API-driven virtual experiment simulation)
 │
 ├── generate_trials_full.py       ← TRIAL GENERATION API
 ├── generate_trials_from_params.py
@@ -62,38 +55,54 @@ from user_simulation import TrialSimulator, SessionGenerator
 ### 2. **Implementation Layer** (`src/`)
 
 **Current internal structure:**
-- `src.reasoning_strategies` → Cognitive reasoning API and strategy registry
-- `src.reasoning_strategies.forward` → CoAX/CoXAM forward reasoning strategies
-- `src.reasoning_strategies.counterfactual` → CoXAM counterfactual strategies
-- `src.reasoning_strategies.memory` → Cognitive memory backends
-- `src.reasoning_strategies.cr_agent` → CoXAM CR agent orchestration
+- `src.cognitive_models` → Cognitive reasoning API and strategy registry
+- `src.cognitive_models.forward` → CoAX/CoXAM forward reasoning strategies
+- `src.cognitive_models.counterfactual` → CoXAM counterfactual strategies
+- `src.cognitive_models.memory` → Cognitive memory backends
+- `src.cognitive_models.cr_agent` → CoXAM CR agent orchestration
 - `src.models` → AI models (CoAX & CoXAM)
 - `src.data_loaders` → Data processing and XAI dataset CSV parsing
 - `src.xai_adapter` → XAI methods (SHAP, LIME, Captum, rules/weights, precomputed wrappers)
 - `src.virtual_experiment_executor` → API-driven virtual experiment simulation
 
-### 3. **Experiments Layer** (`experiments/`)
+### 3. **Experiment Planner Interface** (`experiment_planner_interface/`)
 
-**Purpose:** Example workflows and experiment runners
+**Purpose:** Plan and run human-subject XAI evaluation sessions.
+
+Install from the interface folder:
+
+```bash
+cd experiment_planner_interface
+pip install -e .
+```
 
 ```python
-from experiments import ExperimentRunner, EvaluationMetrics
+from xai_tester import control, design, io
 
-config = ExperimentRunner.Config(
-    dataset="wine_quality",
-    reasoning_model="coxam",
-    n_participants=50
+exp = design.Experiment(name="LIME Study", labels=["Approved", "Rejected"])
+exp.load_csv(
+    "data.csv",
+    ai_label_col="ai_label",
+    xai_cols=["xai_age", "xai_income", "xai_score"],
 )
-runner = ExperimentRunner(config)
-results = runner.run()
-metrics = EvaluationMetrics(results)
+
+control.initialise(exp)
+control.start(participant_id="P01")
+
+for i, trial in enumerate(exp.session.trials, start=1):
+    io.present_trial(trial, trial_number=i, total_trials=exp.session.n_trials, labels=exp.labels)
+    response, rt = io.get_response(trial)
+    exp.data.record(trial, response, rt)
+
+control.end()
 ```
 
 **Components:**
-- `experiment_runner.py`: Orchestrate full experiments
-- `evaluation.py`: Compute metrics (accuracy, response time, XAI impact)
-- `coax_evaluation.py`: CoAX-specific evaluation
-- `coxam_evaluation.py`: CoXAM-specific evaluation with CR agent
+- `xai_tester.design`: Defines `Experiment`, `Session`, and `Trial`
+- `xai_tester.control`: Manages lifecycle calls such as `initialise()`, `start()`, `pause()`, and `end()`
+- `xai_tester.io`: Presents trials and records participant responses
+- `xai_tester.misc`: Provides timing and configurable defaults
+- `Examples/`: Runnable loan approval and wine quality studies
 
 ### 4. **Trial Generation API** (NEW)
 
@@ -134,16 +143,29 @@ simulator = TrialSimulator()
 responses = simulator.simulate(config)
 ```
 
-### Experiment Runners
+### Experiment Planner Interface
 
 ```python
-# Run evaluation workflows
-from experiments import ExperimentRunner, EvaluationMetrics
-from user_simulation import TrialSimulator
+# Run participant-facing XAI evaluation sessions
+from xai_tester import control, design, io
 
-runner = ExperimentRunner(config)
-results = runner.run()
-metrics = EvaluationMetrics(results).summary()
+exp = design.Experiment(name="Loan Approval Study", labels=["Approved", "Rejected"])
+exp.load_csv(
+    "experiment_planner_interface/Examples/loan_approval/loan_data.csv",
+    ai_label_col="ai_label",
+    ground_truth_col="ground_truth",
+    xai_cols=[
+        "xai_age",
+        "xai_income_k",
+        "xai_credit_score",
+        "xai_employment_years",
+        "xai_loan_amount_k",
+        "xai_debt_ratio",
+    ],
+)
+
+control.initialise(exp)
+control.start(participant_id="P01")
 ```
 
 ### Trial Generation API
@@ -164,8 +186,8 @@ df = generate_trials_from_params_csv(
 
 ```python
 # Within src modules, import from src
-from src.reasoning_strategies import StrategyRegistry
-from src.reasoning_strategies.memory import UnifiedMemory
+from src.cognitive_models import StrategyRegistry
+from src.cognitive_models.memory import UnifiedMemory
 from src.models import ModelFactory
 from src.data_loaders import UnifiedDataLoader
 from src.xai_adapter import create_xai_method
@@ -211,18 +233,35 @@ result_df = generate_trials_from_params_csv(
 print(f"✓ Generated {len(result_df)} trials")
 ```
 
-### Run Experiments
+### Run A Participant-Facing XAI Study
 
 ```python
-from experiments import ExperimentRunner
+from xai_tester import control, design, io
 
-runner = ExperimentRunner()
-results = runner.run(
-    n_participants=50,
-    n_trials_per_participant=40,
-    dataset='wine_quality'
+exp = design.Experiment(name="Loan Approval Study", labels=["Approved", "Rejected"])
+exp.load_csv(
+    "experiment_planner_interface/Examples/loan_approval/loan_data.csv",
+    ai_label_col="ai_label",
+    ground_truth_col="ground_truth",
+    xai_cols=[
+        "xai_age",
+        "xai_income_k",
+        "xai_credit_score",
+        "xai_employment_years",
+        "xai_loan_amount_k",
+        "xai_debt_ratio",
+    ],
 )
-print(f"✓ Completed {len(results)} trials")
+
+control.initialise(exp)
+control.start(participant_id="P01")
+
+for i, trial in enumerate(exp.session.trials, start=1):
+    io.present_trial(trial, trial_number=i, total_trials=exp.session.n_trials, labels=exp.labels)
+    response, rt = io.get_response(trial)
+    exp.data.record(trial, response, rt)
+
+control.end()
 ```
 
 ## Project Structure by Layer
@@ -238,13 +277,17 @@ user_simulation/          ← Use this
 └── ...
 ```
 
-### Layer 2: Experiment Runners
+### Layer 2: Experiment Planner Interface
 
 ```
-experiments/              ← Use this for workflows
-├── ExperimentRunner
-├── EvaluationMetrics
-└── examples/
+experiment_planner_interface/ ← Use this for participant-facing XAI studies
+├── xai_tester/
+│   ├── control/
+│   ├── design/
+│   ├── io/
+│   └── misc/
+├── Examples/
+└── tests/
 ```
 
 ### Layer 3: Trial Generation API
@@ -260,7 +303,7 @@ generate_trials_*         ← Use this for data generation
 
 ```
 src/                      ← Don't use directly
-├── reasoning_strategies/
+├── cognitive_models/
 │   ├── forward/
 │   ├── counterfactual/
 │   ├── memory/
@@ -277,7 +320,7 @@ To extend this project:
 
 1. **Public API changes**: Update `user_simulation/`
 2. **Trial generation**: Extend `generate_trials_full.py`
-3. **Experiments**: Add to `experiments/` folder
+3. **Experiment planner**: Update `experiment_planner_interface/xai_tester/`
 4. **Implementation**: Modify `src/` modules
 
 Always maintain the public/internal separation!

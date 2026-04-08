@@ -5,7 +5,7 @@ UPDATED SIMULATION RUNNER WITH NEW REASONING STRATEGIES API
 
 This updated script loads cognitive model parameters from the fitted CSV file
 and runs simulations using the new unified reasoning strategies API from
-src/reasoning_strategies/ instead of the old consolidated_human_models.
+src/cognitive_models/ instead of the old consolidated_human_models.
 
 Key improvements:
 - Uses the unified ReasoningStrategy interface from src/
@@ -36,13 +36,13 @@ sys.path.insert(0, str(coax_dir))
 sys.path.insert(0, str(src_path.parent))
 
 # Import from new API
-from src.reasoning_strategies.forward import (
+from src.cognitive_models.forward import (
     SensitiveFeatures,
     SalientFeatures,
     ImportanceCategorization,
     AttributionSum
 )
-from src.reasoning_strategies.interface import StrategyConfig, ReasoningMode, StrategyType
+from src.cognitive_models.interface import StrategyConfig, ReasoningMode, StrategyType
 
 # Import data loader
 from data_loader import AIDatasetLoader

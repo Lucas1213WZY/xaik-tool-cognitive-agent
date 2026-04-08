@@ -4,8 +4,8 @@ RL Agents Module
 Reinforcement learning agents for cognitive strategy selection training.
 
 This module integrates with:
-- src.memory: Unified memory system (ACT-R, Exemplar)
-- src.reasoning_strategies: Forward reasoning strategies (LR Calc, LR Heur, DT)
+- src.cognitive_models.memory: Unified memory system (ACT-R, Exemplar)
+- src.cognitive_models: Forward reasoning strategies (LR Calc, LR Heur, DT)
 
 Environments:
 - DTForwardEnvironment: Decision Tree strategy selection

@@ -1,7 +1,7 @@
 from src.data_loaders import UnifiedDataLoader
-from src.xai_method import create_coxam_explainer
+from src.xai_adapter import create_coxam_xai_method
 from src.user_simulation import SessionGenerator, SessionConfig, StrategyConfig
-from src.reasoning_strategies import initialize_strategies, StrategyRegistry
+from src.cognitive_models import initialize_strategies, StrategyRegistry
 
 
 def main() -> None:
@@ -18,9 +18,9 @@ def main() -> None:
         assets_root="assets",
         app_id="wine_quality",
     )
-    explainer = create_coxam_explainer(
+    explainer = create_coxam_xai_method(
         coxam_loader,
-        explainer_type="decision_tree",
+        method_type="decision_tree",
         app_id="wine_quality",
         model_name="mlp",
         depth=3,

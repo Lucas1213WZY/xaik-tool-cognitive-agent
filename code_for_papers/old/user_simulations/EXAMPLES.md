@@ -30,7 +30,7 @@ cd /path/to/xaik-tool-cognitive-agent
 
 # Generate multi-trial sessions with parameter distributions
 python -m user_simulation.example_session_generation \
-    --distribution-file user_simulation/param_config/distributions.json \
+    --distribution-file assets/param_config/distributions.json \
     --output-dir session_output/ \
     --n-participants 100
 ```

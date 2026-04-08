@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from gymnasium import spaces
 
 from .base_env import BaseRLEnvironment, EnvironmentConfig
-from code_for_papers.old.coxam.src.memory import DeclarativeMemory, CombinedMemory
+from code_for_papers.old.coxam.src.cognitive_models.memory import DeclarativeMemory, CombinedMemory
 
 
 # Action mapping for 5 strategies

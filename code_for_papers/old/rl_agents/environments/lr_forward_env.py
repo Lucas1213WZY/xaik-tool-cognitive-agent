@@ -17,7 +17,7 @@ from gymnasium import spaces
 import logging
 
 from .base_env import BaseRLEnvironment, EnvironmentConfig
-from src.reasoning_strategies import StrategyRegistry, ReasoningMode
+from src.cognitive_models import StrategyRegistry, ReasoningMode
 
 logger = logging.getLogger(__name__)
 

@@ -472,7 +472,7 @@ The RL Agents layer is **independent** from other CoXAM layers but can be used *
 
 ```python
 # Use reasoning strategies in environment callbacks
-from src.reasoning_strategies import StrategyRegistry
+from src.cognitive_models import StrategyRegistry
 
 registry = StrategyRegistry()
 
@@ -484,7 +484,7 @@ registry = StrategyRegistry()
 
 ```python
 # Environments use unified memory system
-from src.memory import ExemplarMemory, ACTRMemory
+from src.cognitive_models.memory import ExemplarMemory, ACTRMemory
 
 # Memory is initialized in environment.reset()
 # Automatically handles CoXAM-specific configurations

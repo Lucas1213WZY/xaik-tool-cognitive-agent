@@ -27,14 +27,14 @@ from typing import Dict, Any, Optional, Tuple, List, Union
 import numpy as np
 from gymnasium import spaces
 import logging
-from src.reasoning_strategies.counterfactual.coxam_counterfactual_rs import (
+from src.cognitive_models.counterfactual.coxam_counterfactual_rs import (
     ZeroOutLRHeuristic,
     ZeroOutLRDisplayed,
     ChangeDTPath,
     RecallChanges,
     MemoryBasedCF
 )
-from src.reasoning_strategies.interface import StrategyConfig
+from src.cognitive_models.interface import StrategyConfig
 
 logger = logging.getLogger(__name__)
 

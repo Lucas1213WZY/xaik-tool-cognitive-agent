@@ -373,7 +373,7 @@ if __name__ == "__main__":
         model, user_loader, ai_dataset_loader,
         lr_df, dt_df, metadata_df,
         strategies, XAI_types, training_cog_params,
-        "user_simulation/param_config/CoXAM_counterfactual_simulation_cog_param.csv",
+        "assets/param_config/CoXAM_counterfactual_simulation_cog_param.csv",
         mode='trial'
     )
     
@@ -382,7 +382,7 @@ if __name__ == "__main__":
         model, user_loader, ai_dataset_loader,
         lr_df, dt_df, metadata_df,
         strategies, XAI_types, training_cog_params,
-        "user_simulation/param_config/CoXAM_counterfactual_simulation_cog_param.csv",
+        "assets/param_config/CoXAM_counterfactual_simulation_cog_param.csv",
         mode='participant',
         output_csv='generated_trials_participant.csv',
         n_trials_per_participant=40  # optional limit
@@ -393,7 +393,7 @@ if __name__ == "__main__":
         model, user_loader, ai_dataset_loader,
         lr_df, dt_df, metadata_df,
         strategies, XAI_types, training_cog_params,
-        "user_simulation/param_config/CoXAM_counterfactual_simulation_cog_param.csv",
+        "assets/param_config/CoXAM_counterfactual_simulation_cog_param.csv",
         mode='experiment',
         output_csv='generated_trials_experiment.csv',
         n_participants=10,  # sample 10 participants from CSV

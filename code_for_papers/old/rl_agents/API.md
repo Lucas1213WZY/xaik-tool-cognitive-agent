@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `src/rl_agents` module provides a complete reinforcement learning framework for training cognitive agents to select optimal reasoning strategies. It integrates seamlessly with the unified memory system (`src.memory`) and reasoning strategies registry (`src.reasoning_strategies`).
+The `src/rl_agents` module provides a complete reinforcement learning framework for training cognitive agents to select optimal reasoning strategies. It integrates seamlessly with the unified memory system (`src.cognitive_models.memory`) and reasoning strategies registry (`src.cognitive_models`).
 
 **Latest Version:** 0.1.0
 
@@ -926,6 +926,6 @@ Interfaces are stable but may change based on user feedback.
 ## See Also
 
 - [Memory Layer Docs](../memory/)
-- [Reasoning Strategies Docs](../reasoning_strategies/)
+- [Reasoning Strategies Docs](../cognitive_models/)
 - [Stable-Baselines3 Docs](https://stable-baselines3.readthedocs.io/)
 - [Gymnasium Docs](https://gymnasium.farama.org/)
