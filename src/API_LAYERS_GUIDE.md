@@ -95,8 +95,11 @@ src/
 │   │   ├── captum.py
 │   │   └── global_importance.py
 │   └── surrogate/
+│       ├── base.py                    (SurrogateMethod, CustomSurrogate, make_surrogate)
 │       ├── decision_tree.py
-│       └── logistic_regression.py
+│       ├── logistic_regression.py
+│       ├── rule_list.py
+│       └── rule_set.py
 │
 ```
 
@@ -142,6 +145,22 @@ importances = result.values
 Use this layer when you need direct SHAP, LIME, Captum, LOFO, sklearn-style
 feature importance calls, CoXAM rules-vs-weights methods, or a thin wrapper
 around precomputed explanations parsed by `data_loaders.XAIDatasetParser`.
+Custom attribution and surrogate helpers let you wrap project-specific
+algorithms without subclassing:
+
+```python
+from src.xai_adapter import create_custom_xai_method, make_surrogate
+
+attribution = create_custom_xai_method(my_attribution_fn, method_name="mine")
+
+surrogate = make_surrogate(
+    fit_fn=my_surrogate_fit,
+    explain_fn=my_surrogate_explain,
+    name="my_surrogate",
+)
+surrogate.fit(X_train, y_train)
+result = surrogate.explain(X_test[:5])
+```
 
 ### Layer 2: AI Models - `models/`
 **Purpose:** Make predictions and store cognitive data.
@@ -405,7 +424,7 @@ session = session_gen.generate_session(
 | Layer | Key Principle | Example |
 |-------|---------------|---------|
 | `data_loaders/` | **Stateless** — no memory, just processing | Feature normalization, XAI dataset CSV parsing |
-| `xai_adapter/` | **Unified XAI methods** — feature attribution, rules vs weights, precomputed wrappers | SHAP, LIME, Captum, CoXAM LR/DT |
+| `xai_adapter/` | **Unified XAI methods** — feature attribution, custom surrogates, rules vs weights, precomputed wrappers | SHAP, LIME, Captum, CoXAM LR/DT, custom fit/explain |
 | `models/` | **Unified factory** — CoAX or CoXAM | Model factory with registry |
 | `memory/` | **Integrated infrastructure** — shared by all strategies | ACT-R activation & decay |
 | `cognitive_models/` | **Plugins + Memory** — used by both CoAX & CoXAM | DTTraversal (CoXAM), SensitiveFeatures (CoAX) |
@@ -425,6 +444,8 @@ session = session_gen.generate_session(
 | **Custom reasoning** | `cognitive_models.DTTraversal` | `.infer()` with memory | **CoXAM only** |
 | **Load data** | `data_loaders.UnifiedDataLoader` | `.load_dataset()` | Shared |
 | **Use XAI method** | `xai_adapter.create_xai_method()` | `.fit()` / `.explain()` | Shared |
+| **Wrap custom attribution** | `xai_adapter.create_custom_xai_method()` | `.fit()` / `.explain()` | Shared |
+| **Wrap custom surrogate** | `xai_adapter.make_surrogate()` or `xai_adapter.create_custom_surrogate_method()` | `.fit()` / `.explain()` | Shared |
 | **Get model** | `models.ModelFactory` | `.create()` | Shared |
 
 ---

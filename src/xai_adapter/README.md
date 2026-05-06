@@ -16,6 +16,7 @@ Supported adapters:
 - `precomputed_csv` / `csv`: expose precomputed explanation vectors from a `data_loaders.XAIDatasetParser`
 - `decision_tree` / `rules`: CoXAM decision-tree surrogate from explanation tables
 - `logistic_regression` / `weights`: CoXAM logistic-regression surrogate from explanation tables
+- `make_surrogate` / `create_custom_surrogate_method`: wrap custom surrogate fit/explain callables
 - `generate_surrogate_xai_methods`: train fresh rules/weights surrogates when a new CSV has instances and AI predictions but no precomputed CoXAM tables
 
 The public API is organized by adapter family:
@@ -23,7 +24,7 @@ The public API is organized by adapter family:
 ```text
 xai_adapter/
   attribution/          # local attribution and global importance methods
-  surrogate/            # rules/weights surrogate methods
+  surrogate/            # rules/weights and custom surrogate methods
   dataset.py            # precomputed CSV explanations
 ```
 
@@ -90,16 +91,45 @@ def my_attribution(x):
     return np.asarray(x) * 0.5
 
 method = create_custom_xai_method(my_attribution, method_name="my_method")
-result = method.attribute(X_test)
+result = method.explain(X_test)
 
 register_xai_method("my_method", my_attribution, "mine")
 result = create_xai_method("mine").explain(X_test)
 ```
 
 Custom implementations may be plain functions, or objects/classes exposing
-`fit`, `explain`, or Captum-style `attribute`. Raw arrays, `(values,
-base_values)` tuples, and `XAIAdapterResult` objects are normalized to the same
-result type used by built-in adapters.
+`fit` and `explain`. Legacy objects exposing `attribute` are still accepted,
+but `explain` is the canonical call across attribution, surrogate, and
+CSV-backed methods. Raw arrays, `(values, base_values)` tuples, and
+`XAIAdapterResult` objects are normalized to the same result type used by
+built-in adapters.
+
+Custom surrogate methods use the same adapter shape, but provide separate
+`fit_fn` and `explain_fn` callables:
+
+```python
+import numpy as np
+from src.xai_adapter import create_custom_surrogate_method, make_surrogate
+
+def fit_surrogate(X, y, **kwargs):
+    state["mean_prediction"] = float(np.mean(y))
+
+def explain_surrogate(instances):
+    rows = np.asarray(instances, dtype=float)
+    return rows * state["mean_prediction"]
+
+state = {}
+
+surrogate = make_surrogate(fit_surrogate, explain_surrogate, name="my_surrogate")
+result = surrogate.fit(X_train, y_train).explain(X_test)
+
+# Equivalent higher-level constructor.
+surrogate = create_custom_surrogate_method(
+    fit_surrogate,
+    explain_surrogate,
+    method_name="my_surrogate",
+)
+```
 
 Rules-vs-weights methods use the same pattern:
 

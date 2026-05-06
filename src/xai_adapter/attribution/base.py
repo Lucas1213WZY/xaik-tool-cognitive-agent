@@ -20,7 +20,7 @@ class Attribution(XAIAdapter):
     """Base class for local feature attribution methods."""
 
     def attribute(self, instances: ArrayLike, **kwargs) -> XAIAdapterResult:
-        """Captum-style alias for explaining instances."""
+        """Backward-compatible alias for explaining instances."""
         return self.explain(instances, **kwargs)
 
 
@@ -40,8 +40,9 @@ class CustomAttribution(LocalAttribution):
     Adapter for user-provided attribution functions or objects.
 
     The wrapped implementation can be a callable, or an object exposing
-    `fit`, `explain`, or `attribute`. Outputs can be an `XAIAdapterResult`, a
-    raw attribution array, or a `(values, base_values)` tuple.
+    `fit`, `explain`, or a legacy `attribute`. Outputs can be an
+    `XAIAdapterResult`, a raw attribution array, or a `(values, base_values)`
+    tuple.
     """
 
     method_name = "custom"
@@ -87,13 +88,13 @@ class CustomAttribution(LocalAttribution):
 
     def _call_algorithm(self, raw_instances: np.ndarray, processed_instances: np.ndarray, **kwargs):
         call_kwargs = {**self.algorithm_kwargs, **kwargs}
-        if hasattr(self.algorithm, "attribute"):
-            return self.algorithm.attribute(processed_instances, **call_kwargs)
         if hasattr(self.algorithm, "explain"):
             return self.algorithm.explain(processed_instances, **call_kwargs)
+        if hasattr(self.algorithm, "attribute"):
+            return self.algorithm.attribute(processed_instances, **call_kwargs)
         if callable(self.algorithm):
             return self.algorithm(processed_instances, **call_kwargs)
-        raise TypeError("Custom attribution algorithm must be callable or expose explain()/attribute()")
+        raise TypeError("Custom attribution algorithm must be callable or expose explain()")
 
     def _coerce_result(self, raw_instances: np.ndarray, output: Any) -> XAIAdapterResult:
         if isinstance(output, XAIAdapterResult):

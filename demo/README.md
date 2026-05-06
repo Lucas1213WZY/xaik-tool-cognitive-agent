@@ -7,50 +7,43 @@ This demo is intentionally separate from `src/`.
 Run this from the repository root:
 
 ```bash
-python demo/generate_coax_parameter_ranges.py
+conda run -n xaikit-coax python demo/generate_coax_parameter_ranges.py
 ```
 
-It reads:
+It reads `assets/param_config/CoAX_cog_param.csv` and writes
+`assets/demo/coax_cognitive_parameter_ranges.json`.
 
-```text
-assets/param_config/CoAX_cog_param.csv
+## 2. Start the Demo Server
+
+```bash
+conda run -n xaikit-coax python demo/server.py
 ```
 
-and writes:
+Then open **http://localhost:5000/demo/**
 
-```text
-assets/demo/coax_cognitive_parameter_ranges.json
-```
+The server handles both the static demo files and the `/api/simulate` endpoint,
+so the "Run Simulation" button works end-to-end.
 
-The JSON contains global ranges and per-`appId` ranges for the CoAX cognitive
-parameters found in the fitted CSV.
+### Legacy static server (payload-only, no simulation)
 
-It also includes ranges nested by `appId` and `XAIType`. This matters because
-the fitted CSV does not give every row both `sensitivity` and `scaling_factor`:
-the available sliders should reflect the selected app and explanation type.
-
-## 2. Open The UI
-
-Serve the repo root so the browser can load the generated asset:
+If you only need to inspect the payload without running a live simulation:
 
 ```bash
 python -m http.server 8000
-```
-
-Then open:
-
-```text
-http://localhost:8000/demo/
+# open http://localhost:8000/demo/
 ```
 
 ## What The UI Does
 
-- Select `appId` interactively.
-- Select `XAIType` interactively.
-- Use app+XAI-type, app-level, or global CSV ranges.
-- Set each cognitive parameter with a slider and numeric input.
-- Enter either a list of `instance_ids` or real data instances as JSON.
-- Paste real human response rows as CSV or JSON and map their instance and
-  response columns. The payload exposes these rows under
-  `human_response_mapping.rows`, joined by `instance_id`.
-- Copy or download the resulting demo payload.
+- **Cognitive Parameter sliders** — set `k`, `sensitivity`, `retrieval_threshold`,
+  and (for Attribution type) `scaling_factor` using the fitted CSV ranges.
+- **Run Simulation** — sends the slider values to the server, which calls
+  `simulate_virtual_experiment` and returns trial rows.
+  - *Custom mode*: runs a single virtual participant with exactly the slider values.
+  - *From CSV mode*: runs the first N fitted participants from the CSV.
+- **Accuracy Chart** — bar chart of test-trial accuracy by reasoning strategy and
+  condition (w/ XAI vs w/o XAI). If human responses are pasted, they are overlaid
+  as additional bars (matching the Fig. 9 style from the CoAX paper).
+- **Trial Table** — scrollable row-level view of every simulated trial: strategy,
+  condition, trial type, CoAX prediction, correctness, and probability.
+- **Download Config / Copy** — export the current payload as JSON.

@@ -1,4 +1,4 @@
-"""Tabular attribution methods backed by tabular XAI libraries."""
+"""LIME-backed tabular attribution methods."""
 
 from __future__ import annotations
 
@@ -10,10 +10,10 @@ from ..base import ArrayLike, PostprocessFn, PreprocessFn, XAIAdapterResult, ens
 from .base import LocalAttribution
 
 
-class LimeTabular(LocalAttribution):
+class Lime(LocalAttribution):
     """LIME tabular method with a sklearn-like fit/explain API."""
 
-    method_name = "lime_tabular"
+    method_name = "lime"
 
     def __init__(
         self,
@@ -49,10 +49,10 @@ class LimeTabular(LocalAttribution):
     def fit(self, X: ArrayLike, y: ArrayLike = None, **kwargs):
         """Fit the LIME tabular explainer on training data."""
         try:
-            import lime.lime_tabular
+            import lime.lime_tabular as lime_tabular
             from lime.discretize import BaseDiscretizer
         except ImportError as exc:
-            raise ImportError("LIME is required for LimeTabular. Install with: pip install lime") from exc
+            raise ImportError("LIME is required for Lime. Install with: pip install lime") from exc
 
         training_data = ensure_2d(X)
         training_labels = y if y is not None else self.training_labels
@@ -60,7 +60,7 @@ class LimeTabular(LocalAttribution):
 
         class PercentileDiscretizer(BaseDiscretizer):
             def __init__(self, data, categorical_features, feature_names, labels=None, random_state=None, bins=4):
-                self.num_bins = bins
+                self.num_bins = int(bins)
                 super().__init__(data, categorical_features, feature_names, labels=labels, random_state=random_state)
 
             def bins(self, data, labels):
@@ -77,7 +77,7 @@ class LimeTabular(LocalAttribution):
             labels=training_labels,
             bins=self.n_bins,
         )
-        self.explainer = lime.lime_tabular.LimeTabularExplainer(
+        self.explainer = lime_tabular.LimeTabularExplainer(
             training_data,
             mode="classification",
             training_labels=training_labels,
@@ -122,10 +122,4 @@ class LimeTabular(LocalAttribution):
         )
 
 
-LimeTabularMethod = LimeTabular
-
-
-__all__ = [
-    "LimeTabular",
-    "LimeTabularMethod",
-]
+__all__ = ["Lime"]

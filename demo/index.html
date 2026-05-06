@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>CoAX Cognitive Parameter Demo</title>
     <link rel="stylesheet" href="./styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
   </head>
   <body>
     <main class="shell">
@@ -13,7 +14,13 @@
           <p class="eyebrow">CoAX Demo</p>
           <h1>Cognitive Parameter Builder</h1>
         </div>
-        <button id="downloadConfig" type="button">Download Config</button>
+        <div class="topbar-actions">
+          <button id="downloadConfig" type="button">Download Config</button>
+          <button id="runSim" type="button" class="btn-primary">
+            <span id="runSimLabel">Run Simulation</span>
+            <span id="runSimSpinner" class="spinner is-hidden"></span>
+          </button>
+        </div>
       </section>
 
       <section class="status" id="status">
@@ -21,6 +28,7 @@
       </section>
 
       <section class="layout">
+        <!-- ── Controls ── -->
         <aside class="panel controls-panel">
           <div class="field">
             <label for="appId">App ID</label>
@@ -80,8 +88,32 @@
             <label for="humanParticipantColumn">Participant Column</label>
             <select id="humanParticipantColumn"></select>
           </div>
+
+          <div class="divider"></div>
+
+          <!-- ── Simulation controls ── -->
+          <p class="section-label">Simulation</p>
+
+          <div class="field">
+            <label for="simMode">Run Mode</label>
+            <select id="simMode">
+              <option value="custom">Custom parameters (slider values)</option>
+              <option value="from_csv">From fitted CSV participants</option>
+            </select>
+          </div>
+
+          <div id="maxParticipantsField" class="field is-hidden">
+            <label for="maxParticipants">Max Participants</label>
+            <input id="maxParticipants" type="number" min="1" max="50" value="5" />
+          </div>
+
+          <div class="field">
+            <label>Strategies to Simulate</label>
+            <div id="strategyChecks" class="strategy-checks"></div>
+          </div>
         </aside>
 
+        <!-- ── Sliders ── -->
         <section class="panel slider-panel">
           <div class="panel-head">
             <h2>Cognitive Parameters</h2>
@@ -90,6 +122,7 @@
           <div id="sliders" class="sliders"></div>
         </section>
 
+        <!-- ── Payload preview ── -->
         <section class="panel output-panel">
           <div class="panel-head">
             <h2>Demo Payload</h2>
@@ -98,12 +131,45 @@
           <pre id="payloadPreview"></pre>
         </section>
 
+        <!-- ── Human responses ── -->
         <section class="panel human-panel">
           <div class="panel-head">
             <h2>Mapped Human Responses</h2>
           </div>
           <pre id="humanPreview"></pre>
         </section>
+      </section>
+
+      <!-- ── Simulation results ── -->
+      <section class="panel results-section is-hidden" id="resultsSection">
+        <div class="panel-head">
+          <h2>Simulation Results</h2>
+          <div class="tabs" role="tablist" aria-label="Result view">
+            <button class="tab is-active" type="button" data-result-view="chart">Accuracy Chart</button>
+            <button class="tab" type="button" data-result-view="table">Trial Table</button>
+          </div>
+        </div>
+
+        <div id="simSummaryBar" class="sim-summary-bar"></div>
+
+        <div id="chartView" class="result-view">
+          <div class="chart-wrap">
+            <canvas id="accuracyChart"></canvas>
+          </div>
+          <p class="chart-note">
+            Test-trial accuracy by reasoning strategy and condition.
+            <span id="humanNoteSpan"></span>
+          </p>
+        </div>
+
+        <div id="tableView" class="result-view is-hidden">
+          <div class="table-wrap">
+            <table id="trialTable" class="trial-table">
+              <thead></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
       </section>
     </main>
 

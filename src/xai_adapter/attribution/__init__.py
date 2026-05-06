@@ -1,11 +1,10 @@
 """Feature attribution methods and plugin adapters."""
 
 from .base import Attribution, CustomAttribution, GlobalImportance, LocalAttribution, make_attribution
-from .captum import CaptumAttribution, DeepLift, DeepLiftMethod, IntegratedGradients, IntegratedGradientsMethod
-from .global_importance import SklearnFeatureImportance, SklearnGlobalFeatureImportanceMethod
-from .gradient import GradientInput, GradientInputMethod
-from .perturbation import KernelShap, LeaveOneFeatureOut, LOFOMethod, SHAPKernel, SHAPKernelMethod
-from .tabular import LimeTabular, LimeTabularMethod
+from .captum import CaptumAttribution, DeepLift, GradientInput, IntegratedGradients
+from .global_importance import SklearnFeatureImportance
+from .lime import Lime
+from .perturbation import KernelShap, LeaveOneFeatureOut
 
 __all__ = [
     "Attribution",
@@ -15,18 +14,10 @@ __all__ = [
     "make_attribution",
     "CaptumAttribution",
     "DeepLift",
-    "DeepLiftMethod",
     "IntegratedGradients",
-    "IntegratedGradientsMethod",
     "GradientInput",
-    "GradientInputMethod",
     "KernelShap",
-    "SHAPKernel",
-    "SHAPKernelMethod",
     "LeaveOneFeatureOut",
-    "LOFOMethod",
-    "LimeTabular",
-    "LimeTabularMethod",
+    "Lime",
     "SklearnFeatureImportance",
-    "SklearnGlobalFeatureImportanceMethod",
 ]

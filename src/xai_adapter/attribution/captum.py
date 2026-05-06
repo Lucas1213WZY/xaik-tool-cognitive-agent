@@ -135,14 +135,56 @@ class IntegratedGradients(CaptumAttribution):
         super().__init__(**kwargs)
 
 
-DeepLiftMethod = DeepLift
-IntegratedGradientsMethod = IntegratedGradients
+class GradientInput(CaptumAttribution):
+    """Captum InputXGradient (gradient × input) attribution.
+
+    Unlike DeepLift and IntegratedGradients, this method requires no baseline
+    — the attribution is purely ∂f/∂x × x — so ``predict_fn`` and
+    ``background_data`` are not used.
+    """
+
+    method_name = "gradient_input"
+
+    def __init__(self, *, model, predict_fn: Optional[Callable] = None, **kwargs):
+        try:
+            from captum.attr import InputXGradient
+        except ImportError as exc:
+            raise ImportError("Captum is required for GradientInput. Install with: pip install captum") from exc
+        self.captum_attr_cls = InputXGradient
+        # predict_fn is unused; pass a no-op so the base __init__ is satisfied.
+        super().__init__(model=model, predict_fn=predict_fn or (lambda x: x), **kwargs)
+
+    def fit(self, X: ArrayLike = None, y: ArrayLike = None, **kwargs):
+        """No-op — GradientInput needs no baseline."""
+        self.is_fitted = True
+        return self
+
+    def explain(self, instances: ArrayLike) -> XAIAdapterResult:
+        """Return gradient × input attributions as an XAIAdapterResult.
+
+        Conversion chain: numpy input → torch tensor → Captum
+        InputXGradient → ``.detach().cpu().numpy()`` → XAIAdapterResult.
+        """
+        self._require_fitted()
+        raw_instances = ensure_2d(instances)
+        x_np = ensure_2d(self.preprocessing_fn(raw_instances))
+        x = self.torch.tensor(x_np, dtype=self.torch.float32, device=self.device)
+
+        attributions = self.attr.attribute(x, target=self.target, **self.attribute_kwargs)
+        if isinstance(attributions, tuple):
+            attributions = attributions[0]
+
+        values = self._postprocess_values(raw_instances, attributions.detach().cpu().numpy())
+        return XAIAdapterResult(
+            values=values,
+            base_values=np.zeros(values.shape[0], dtype=float),
+            method=self.method_name,
+        )
 
 
 __all__ = [
     "CaptumAttribution",
     "DeepLift",
-    "DeepLiftMethod",
+    "GradientInput",
     "IntegratedGradients",
-    "IntegratedGradientsMethod",
 ]

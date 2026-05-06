@@ -55,27 +55,34 @@ def get_adapter_registry() -> XAIAdapterRegistry:
     if _GLOBAL_REGISTRY is None:
         from .dataset import PrecomputedCSVXAIMethod
         from .attribution import (
-            DeepLiftMethod,
-            GradientInputMethod,
-            IntegratedGradientsMethod,
-            LimeTabularMethod,
-            LOFOMethod,
-            SHAPKernelMethod,
-            SklearnGlobalFeatureImportanceMethod,
+            DeepLift,
+            GradientInput,
+            IntegratedGradients,
+            KernelShap,
+            LeaveOneFeatureOut,
+            Lime,
+            SklearnFeatureImportance,
         )
-        from .surrogate import DecisionTreeSurrogateMethod, LogisticRegressionSurrogateMethod
+        from .surrogate import (
+            DecisionTreeSurrogateMethod,
+            LogisticRegressionSurrogateMethod,
+            RuleListSurrogateMethod,
+            RuleSetSurrogateMethod,
+        )
 
         registry = XAIAdapterRegistry()
-        registry.register("lofo", LOFOMethod, "leave_one_feature_out")
-        registry.register("shap_kernel", SHAPKernelMethod, "shap")
-        registry.register("lime_tabular", LimeTabularMethod, "lime")
-        registry.register("gradient_input", GradientInputMethod, "gradient_x_input")
-        registry.register("deeplift", DeepLiftMethod, "deep_lift")
-        registry.register("integrated_gradients", IntegratedGradientsMethod, "ig")
-        registry.register("sklearn_global", SklearnGlobalFeatureImportanceMethod, "global_feature_importance")
+        registry.register("lofo", LeaveOneFeatureOut, "leave_one_feature_out")
+        registry.register("shap_kernel", KernelShap, "shap")
+        registry.register("lime", Lime, "lime_tabular")
+        registry.register("gradient_input", GradientInput, "gradient_x_input", "input_gradients")
+        registry.register("deeplift", DeepLift, "deep_lift")
+        registry.register("integrated_gradients", IntegratedGradients, "ig")
+        registry.register("sklearn_global", SklearnFeatureImportance, "global_feature_importance")
         registry.register("precomputed_csv", PrecomputedCSVXAIMethod, "csv", "csv_dataset", "dataset_csv")
         registry.register("decision_tree", DecisionTreeSurrogateMethod, "dt", "rules")
         registry.register("logistic_regression", LogisticRegressionSurrogateMethod, "lr", "weights")
+        registry.register("rule_list", RuleListSurrogateMethod, "rulelist")
+        registry.register("rule_set", RuleSetSurrogateMethod, "ruleset")
         _GLOBAL_REGISTRY = registry
     return _GLOBAL_REGISTRY
 

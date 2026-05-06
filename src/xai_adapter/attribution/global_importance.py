@@ -53,10 +53,6 @@ class SklearnFeatureImportance(GlobalImportance):
         }
 
 
-SklearnGlobalFeatureImportanceMethod = SklearnFeatureImportance
-
-
 __all__ = [
     "SklearnFeatureImportance",
-    "SklearnGlobalFeatureImportanceMethod",
 ]

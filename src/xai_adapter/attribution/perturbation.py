@@ -143,15 +143,7 @@ class KernelShap(LocalAttribution):
         )
 
 
-LOFOMethod = LeaveOneFeatureOut
-SHAPKernel = KernelShap
-SHAPKernelMethod = KernelShap
-
-
 __all__ = [
     "KernelShap",
     "LeaveOneFeatureOut",
-    "LOFOMethod",
-    "SHAPKernel",
-    "SHAPKernelMethod",
 ]

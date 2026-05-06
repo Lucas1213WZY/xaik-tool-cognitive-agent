@@ -8,7 +8,7 @@ from .base import ArrayLike
 from .attribution import make_attribution
 from src.data_loaders.xai_dataset import XAIDatasetParser
 from .registry import create_xai_method
-from .surrogate import GeneratedSurrogateMethods
+from .surrogate import GeneratedSurrogateMethods, make_surrogate
 
 
 def _train_x(train_data: Any) -> ArrayLike:
@@ -82,7 +82,7 @@ def create_xai_method_from_engine(
             **kwargs,
         )
 
-    if key in {"gradient_input", "gradient_x_input"}:
+    if key in {"gradient_input", "gradient_x_input", "input_gradients"}:
         return create_xai_method(
             name,
             model=engine.model,
@@ -117,11 +117,26 @@ def create_custom_xai_method(
     """
     Wrap a user-provided function or object in the common XAI adapter API.
 
-    The algorithm can be a callable, or an object exposing `fit`, `explain`, or
-    `attribute`. The returned adapter supports `fit`, `explain`, and
-    Captum-style `attribute`.
+    The algorithm can be a callable, or an object exposing `fit` and `explain`.
+    Legacy objects exposing `attribute` are still accepted for compatibility,
+    but `explain` is the canonical public method.
     """
     return make_attribution(algorithm, method_name=method_name, **kwargs)
+
+
+def create_custom_surrogate_method(
+    fit_fn: Any,
+    explain_fn: Any,
+    *,
+    method_name: str = "custom",
+):
+    """
+    Wrap user-provided fit/explain callables in the surrogate adapter API.
+
+    The returned method implements the `SurrogateMethod` interface and supports
+    sklearn-style `fit(...).explain(...)` chaining.
+    """
+    return make_surrogate(fit_fn, explain_fn, name=method_name)
 
 
 def create_coxam_xai_method(

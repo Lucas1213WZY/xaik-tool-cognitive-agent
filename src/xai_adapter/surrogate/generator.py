@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import json
+from collections import deque
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
 import numpy as np
 import pandas as pd
@@ -242,3 +243,131 @@ def generate_surrogate_tables(
         )
 
     return decision_tree_df, logistic_regression_df, metadata_df
+
+
+def extract_tree_rules(
+    tree,
+    n_classes: int,
+) -> List[Tuple[List[Tuple[int, float, bool]], int, float]]:
+    """Extract root-to-leaf paths from an sklearn tree_ attribute.
+
+    Returns ``(conditions, class_idx, confidence)`` tuples in DFS left-to-right
+    order.  Each condition is ``(feat_idx, threshold, is_leq)`` where
+    ``is_leq=True`` means the condition fires on the left branch
+    (``value <= threshold``).
+    """
+    from sklearn.tree import _tree
+
+    rules: List[Tuple[List[Tuple[int, float, bool]], int, float]] = []
+
+    def _recurse(node_id: int, path: List[Tuple[int, float, bool]]) -> None:
+        if tree.children_left[node_id] == _tree.TREE_LEAF:
+            counts = tree.value[node_id][0].astype(float)
+            total = counts.sum()
+            class_idx = int(np.argmax(counts))
+            confidence = float(counts[class_idx] / total) if total > 0 else 1.0 / n_classes
+            rules.append((list(path), class_idx, confidence))
+            return
+        feat = int(tree.feature[node_id])
+        thresh = float(tree.threshold[node_id])
+        _recurse(tree.children_left[node_id], path + [(feat, thresh, True)])
+        _recurse(tree.children_right[node_id], path + [(feat, thresh, False)])
+
+    _recurse(0, [])
+    return rules
+
+
+def rule_list_to_tree_structure(
+    rules: List[Tuple[List[Tuple[int, float, bool]], int]],
+    default_class_idx: int,
+    n_classes: int,
+) -> List[Dict[str, Any]]:
+    """Convert an ordered rule list into the CoXAM decision-tree node format.
+
+    Each rule is ``(conditions, class_idx)`` where conditions is a list of
+    ``(feat_idx, threshold, is_leq)``.  ``is_leq=True`` fires left
+    (``value <= threshold``); ``is_leq=False`` fires right.
+
+    When a condition fails, traversal falls to the next rule's subtree root.
+    That node id is shared by all fail-branches in the current rule, which the
+    dict-keyed ``nodes_by_id`` in ``DecisionTreeSurrogateMethod`` supports.
+    Node 0 is always the root.
+    """
+    pending: List[Optional[Dict[str, Any]]] = []
+
+    def _alloc() -> int:
+        t = len(pending)
+        pending.append(None)
+        return t
+
+    def _make_leaf(class_idx: int) -> int:
+        t = _alloc()
+        probs = [0.0] * n_classes
+        probs[class_idx] = 1.0
+        pending[t] = {
+            "feature": None, "threshold": None,
+            "left": None, "right": None,
+            "value": probs, "is_leaf": True,
+        }
+        return t
+
+    def _make_split(feat_idx: int, threshold: float, left_t: int, right_t: int) -> int:
+        t = _alloc()
+        pending[t] = {
+            "feature": f"a{feat_idx}", "threshold": threshold,
+            "left": left_t, "right": right_t,
+            "value": [1.0 / n_classes] * n_classes, "is_leaf": False,
+        }
+        return t
+
+    def _build(rule_idx: int, fallback_t: int) -> int:
+        if rule_idx >= len(rules):
+            return fallback_t
+        conditions, class_idx = rules[rule_idx][0], rules[rule_idx][1]
+        next_rule_t = _build(rule_idx + 1, fallback_t)
+        current_t = _make_leaf(class_idx)
+        for feat_idx, threshold, is_leq in reversed(conditions):
+            if is_leq:
+                current_t = _make_split(feat_idx, threshold, current_t, next_rule_t)
+            else:
+                current_t = _make_split(feat_idx, threshold, next_rule_t, current_t)
+        return current_t
+
+    default_leaf_t = _make_leaf(default_class_idx)
+    root_t = _build(0, default_leaf_t)
+
+    # BFS assigns final ids; shared subtrees are visited only once.
+    temp_to_final: Dict[int, int] = {}
+    order: List[int] = []
+    visited: Set[int] = set()
+    queue: deque = deque([root_t])
+    while queue:
+        t = queue.popleft()
+        if t in visited:
+            continue
+        visited.add(t)
+        temp_to_final[t] = len(order)
+        order.append(t)
+        node = pending[t]
+        if not node["is_leaf"]:
+            queue.append(node["left"])
+            queue.append(node["right"])
+
+    return [
+        {
+            "node": temp_to_final[t],
+            "feature": pending[t]["feature"],
+            "threshold": pending[t]["threshold"],
+            "left": (
+                temp_to_final[pending[t]["left"]]
+                if pending[t]["left"] is not None else None
+            ),
+            "right": (
+                temp_to_final[pending[t]["right"]]
+                if pending[t]["right"] is not None else None
+            ),
+            "value": pending[t]["value"],
+            "is_leaf": pending[t]["is_leaf"],
+        }
+        for t in order
+    ]

@@ -9,10 +9,12 @@ import numpy as np
 from src.data_loaders import XAIDatasetParser
 from src.xai_adapter import (
     create_custom_xai_method,
+    create_custom_surrogate_method,
     create_xai_method,
     create_xai_method_from_engine,
     generate_surrogate_xai_methods,
     get_adapter_registry,
+    make_surrogate,
     register_xai_method,
 )
 from src.xai_adapter.attribution import KernelShap, LimeTabular, LeaveOneFeatureOut
@@ -69,7 +71,7 @@ def test_custom_callable_can_be_wrapped_as_xai_method():
         return np.asarray(x, dtype=float) * 2.0
 
     adapter = create_custom_xai_method(custom_algorithm, method_name="double")
-    result = adapter.attribute(np.array([[1.0, -2.0]]))
+    result = adapter.explain(np.array([[1.0, -2.0]]))
 
     assert result.method == "double"
     np.testing.assert_allclose(result.values, np.array([[2.0, -4.0]]))
@@ -86,6 +88,44 @@ def test_custom_callable_can_be_registered_in_global_registry():
 
     assert result.method == "unit_test_custom"
     np.testing.assert_allclose(result.values, np.array([[1.0, 1.0]]))
+
+
+def test_custom_surrogate_callable_pair_can_be_wrapped():
+    fitted = {}
+
+    def fit_fn(X, y, **kwargs):
+        fitted["mean"] = float(np.mean(y))
+        fitted["kwargs"] = kwargs
+
+    def explain_fn(instances):
+        x = np.asarray(instances, dtype=float)
+        return x * fitted["mean"], np.array([fitted["mean"]])
+
+    surrogate = make_surrogate(fit_fn, explain_fn, name="unit_test_surrogate")
+
+    result = surrogate.fit(np.array([[1.0, 2.0]]), np.array([2.0]), alpha=0.5).explain(
+        np.array([[3.0, 4.0]])
+    )
+
+    assert surrogate.is_fitted
+    assert fitted["kwargs"] == {"alpha": 0.5}
+    assert result.method == "unit_test_surrogate"
+    np.testing.assert_allclose(result.values, np.array([[6.0, 8.0]]))
+    np.testing.assert_allclose(result.base_values, np.array([2.0]))
+
+
+def test_custom_surrogate_convenience_constructor_uses_surrogate_api():
+    def fit_fn(X, y, **kwargs):
+        return None
+
+    def explain_fn(instances):
+        return np.asarray(instances, dtype=float) + 1.0
+
+    surrogate = create_custom_surrogate_method(fit_fn, explain_fn, method_name="plus_one_surrogate")
+    result = surrogate.fit(np.array([[0.0]]), np.array([1.0])).explain(np.array([[2.0]]))
+
+    assert result.method == "plus_one_surrogate"
+    np.testing.assert_allclose(result.values, np.array([[3.0]]))
 
 
 def test_create_xai_method_from_engine_supports_coax_style_inputs():

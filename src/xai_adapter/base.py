@@ -121,7 +121,7 @@ class XAIAdapter(ABC):
         """Explain one or more instances."""
 
     def attribute(self, instances: ArrayLike, **kwargs) -> XAIAdapterResult:
-        """Captum-style alias for `explain(...)`."""
+        """Backward-compatible alias for `explain(...)`."""
         return self.explain(instances, **kwargs)
 
     def _postprocess_values(self, raw_instances: ArrayLike, attributions: np.ndarray) -> np.ndarray:
