@@ -496,4 +496,4 @@ Part of xaik-tool-cognitive-agent project.
 For issues, questions, or extensions:
 1. Check `examples.py` for usage patterns
 2. Review base classes in `base/` for extension points
-3. See existing implementations in `sources/`, `normalizers/`, and `src/xai_adapter/feature_attribution_method/`
+3. See existing implementations in `sources/`, `normalizers/`, and `src/xai_adapter/attribution/`

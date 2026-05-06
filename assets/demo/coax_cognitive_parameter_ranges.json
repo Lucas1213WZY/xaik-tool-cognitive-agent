@@ -1,0 +1,339 @@
+{
+  "schema_version": 1,
+  "source": {
+    "csv": "assets/param_config/CoAX_cog_param.csv",
+    "generated_at": "2026-05-06T09:20:13.332149+00:00",
+    "row_count": 761
+  },
+  "parameter_columns": [
+    "k",
+    "sensitivity",
+    "retrieval_threshold",
+    "scaling_factor"
+  ],
+  "app_ids": [
+    "adult",
+    "forest_cover",
+    "wine_quality"
+  ],
+  "xai_types": [
+    "attribution",
+    "importance"
+  ],
+  "global": {
+    "k": {
+      "min": 1,
+      "max": 5,
+      "default": 2,
+      "step": 1,
+      "type": "integer",
+      "count": 761
+    },
+    "sensitivity": {
+      "min": 1.0,
+      "max": 100.0,
+      "default": 25.6571434865,
+      "step": 1.0,
+      "type": "float",
+      "count": 470
+    },
+    "retrieval_threshold": {
+      "min": -4.0,
+      "max": -0.853496335,
+      "default": -3.117136407,
+      "step": 0.03,
+      "type": "float",
+      "count": 761
+    },
+    "scaling_factor": {
+      "min": 0.4662706889,
+      "max": 8.0,
+      "default": 4.5730369861,
+      "step": 0.08,
+      "type": "float",
+      "count": 291
+    }
+  },
+  "by_app": {
+    "adult": {
+      "k": {
+        "min": 1,
+        "max": 5,
+        "default": 2,
+        "step": 1,
+        "type": "integer",
+        "count": 224
+      },
+      "sensitivity": {
+        "min": 1.0,
+        "max": 100.0,
+        "default": 75.345465908,
+        "step": 1.0,
+        "type": "float",
+        "count": 154
+      },
+      "retrieval_threshold": {
+        "min": -4.0,
+        "max": -1.423552897,
+        "default": -3.09857444,
+        "step": 0.03,
+        "type": "float",
+        "count": 224
+      },
+      "scaling_factor": {
+        "min": 0.853981453,
+        "max": 8.0,
+        "default": 4.6036094261,
+        "step": 0.07,
+        "type": "float",
+        "count": 70
+      }
+    },
+    "forest_cover": {
+      "k": {
+        "min": 1,
+        "max": 5,
+        "default": 3,
+        "step": 1,
+        "type": "integer",
+        "count": 234
+      },
+      "sensitivity": {
+        "min": 1.0,
+        "max": 100.0,
+        "default": 21.225152928,
+        "step": 1.0,
+        "type": "float",
+        "count": 137
+      },
+      "retrieval_threshold": {
+        "min": -4.0,
+        "max": -0.853496335,
+        "default": -3.0923689695,
+        "step": 0.03,
+        "type": "float",
+        "count": 234
+      },
+      "scaling_factor": {
+        "min": 0.5675756313,
+        "max": 8.0,
+        "default": 7.9938227535,
+        "step": 0.07,
+        "type": "float",
+        "count": 97
+      }
+    },
+    "wine_quality": {
+      "k": {
+        "min": 1,
+        "max": 5,
+        "default": 2,
+        "step": 1,
+        "type": "integer",
+        "count": 303
+      },
+      "sensitivity": {
+        "min": 1.0,
+        "max": 100.0,
+        "default": 14.999432083,
+        "step": 1.0,
+        "type": "float",
+        "count": 179
+      },
+      "retrieval_threshold": {
+        "min": -4.0,
+        "max": -1.308693149,
+        "default": -3.154394782,
+        "step": 0.03,
+        "type": "float",
+        "count": 303
+      },
+      "scaling_factor": {
+        "min": 0.4662706889,
+        "max": 8.0,
+        "default": 2.6116252675,
+        "step": 0.08,
+        "type": "float",
+        "count": 124
+      }
+    }
+  },
+  "by_app_xai": {
+    "adult": {
+      "importance": {
+        "k": {
+          "min": 1,
+          "max": 5,
+          "default": 2,
+          "step": 1,
+          "type": "integer",
+          "count": 224
+        },
+        "sensitivity": {
+          "min": 1.0,
+          "max": 100.0,
+          "default": 75.345465908,
+          "step": 1.0,
+          "type": "float",
+          "count": 154
+        },
+        "retrieval_threshold": {
+          "min": -4.0,
+          "max": -1.423552897,
+          "default": -3.09857444,
+          "step": 0.03,
+          "type": "float",
+          "count": 224
+        },
+        "scaling_factor": {
+          "min": 0.853981453,
+          "max": 8.0,
+          "default": 4.6036094261,
+          "step": 0.07,
+          "type": "float",
+          "count": 70
+        }
+      }
+    },
+    "forest_cover": {
+      "attribution": {
+        "k": {
+          "min": 1,
+          "max": 5,
+          "default": 3,
+          "step": 1,
+          "type": "integer",
+          "count": 87
+        },
+        "sensitivity": {
+          "min": 2.238753064,
+          "max": 100.0,
+          "default": 10.97862483315,
+          "step": 1.0,
+          "type": "float",
+          "count": 24
+        },
+        "retrieval_threshold": {
+          "min": -4.0,
+          "max": -1.224543138,
+          "default": -3.012696987,
+          "step": 0.03,
+          "type": "float",
+          "count": 87
+        },
+        "scaling_factor": {
+          "min": 0.5675756313,
+          "max": 8.0,
+          "default": 8.0,
+          "step": 0.07,
+          "type": "float",
+          "count": 63
+        }
+      },
+      "importance": {
+        "k": {
+          "min": 1,
+          "max": 5,
+          "default": 3,
+          "step": 1,
+          "type": "integer",
+          "count": 147
+        },
+        "sensitivity": {
+          "min": 1.0,
+          "max": 100.0,
+          "default": 25.908066807,
+          "step": 1.0,
+          "type": "float",
+          "count": 113
+        },
+        "retrieval_threshold": {
+          "min": -4.0,
+          "max": -0.853496335,
+          "default": -3.123156849,
+          "step": 0.03,
+          "type": "float",
+          "count": 147
+        },
+        "scaling_factor": {
+          "min": 0.7472775718,
+          "max": 8.0,
+          "default": 3.58479916835,
+          "step": 0.07,
+          "type": "float",
+          "count": 34
+        }
+      }
+    },
+    "wine_quality": {
+      "attribution": {
+        "k": {
+          "min": 1,
+          "max": 5,
+          "default": 5,
+          "step": 1,
+          "type": "integer",
+          "count": 66
+        },
+        "sensitivity": {
+          "min": 1.0,
+          "max": 100.0,
+          "default": 12.2519526805,
+          "step": 1.0,
+          "type": "float",
+          "count": 12
+        },
+        "retrieval_threshold": {
+          "min": -4.0,
+          "max": -1.5,
+          "default": -2.838052071,
+          "step": 0.02,
+          "type": "float",
+          "count": 66
+        },
+        "scaling_factor": {
+          "min": 1.0422748185,
+          "max": 8.0,
+          "default": 4.43144786325,
+          "step": 0.07,
+          "type": "float",
+          "count": 54
+        }
+      },
+      "importance": {
+        "k": {
+          "min": 1,
+          "max": 5,
+          "default": 2,
+          "step": 1,
+          "type": "integer",
+          "count": 237
+        },
+        "sensitivity": {
+          "min": 1.0,
+          "max": 100.0,
+          "default": 15.132309403,
+          "step": 1.0,
+          "type": "float",
+          "count": 167
+        },
+        "retrieval_threshold": {
+          "min": -4.0,
+          "max": -1.308693149,
+          "default": -3.161459605,
+          "step": 0.03,
+          "type": "float",
+          "count": 237
+        },
+        "scaling_factor": {
+          "min": 0.4662706889,
+          "max": 8.0,
+          "default": 2.29568445325,
+          "step": 0.08,
+          "type": "float",
+          "count": 70
+        }
+      }
+    }
+  }
+}

@@ -1,5 +1,6 @@
 """Surrogate XAI methods for rules-vs-weights comparisons."""
 
+from .base import SurrogateMethod
 from .decision_tree import DecisionTreeSurrogateMethod
 from .generator import (
     GeneratedSurrogateMethods,
@@ -10,6 +11,7 @@ from .generator import (
 from .logistic_regression import LogisticRegressionSurrogateMethod
 
 __all__ = [
+    "SurrogateMethod",
     "DecisionTreeSurrogateMethod",
     "LogisticRegressionSurrogateMethod",
     "GeneratedSurrogateMethods",

@@ -18,6 +18,32 @@ Supported adapters:
 - `logistic_regression` / `weights`: CoXAM logistic-regression surrogate from explanation tables
 - `generate_surrogate_xai_methods`: train fresh rules/weights surrogates when a new CSV has instances and AI predictions but no precomputed CoXAM tables
 
+The public API is organized by adapter family:
+
+```text
+xai_adapter/
+  attribution/          # local attribution and global importance methods
+  surrogate/            # rules/weights surrogate methods
+  dataset.py            # precomputed CSV explanations
+```
+
+Library-backed attribution classes can be imported from `attribution`:
+
+```python
+from src.xai_adapter.attribution import (
+    IntegratedGradients,
+    DeepLift,
+    GradientInput,
+    KernelShap,
+    LimeTabular,
+    LeaveOneFeatureOut,
+)
+```
+
+`KernelShap` uses SHAP's `KernelExplainer`, and `LimeTabular` uses LIME's
+tabular explainer. The old `*Method` names and `create_xai_method(...)`
+factory aliases remain available for compatibility.
+
 Example:
 
 ```python
@@ -32,6 +58,8 @@ method.fit(X_train)
 result = method.explain(X_test[:5])
 values = result.values
 base_values = result.base_values
+signed_attributions = result.attributions
+absolute_importances = result.importances
 ```
 
 Use `preprocessing_fn` and `postprocessing_fn` when the model consumes
@@ -51,6 +79,27 @@ method = create_xai_method_from_engine(
 
 result = method.explain(instances)
 ```
+
+Custom XAI algorithms can be wrapped as adapters too:
+
+```python
+import numpy as np
+from src.xai_adapter import create_custom_xai_method, register_xai_method
+
+def my_attribution(x):
+    return np.asarray(x) * 0.5
+
+method = create_custom_xai_method(my_attribution, method_name="my_method")
+result = method.attribute(X_test)
+
+register_xai_method("my_method", my_attribution, "mine")
+result = create_xai_method("mine").explain(X_test)
+```
+
+Custom implementations may be plain functions, or objects/classes exposing
+`fit`, `explain`, or Captum-style `attribute`. Raw arrays, `(values,
+base_values)` tuples, and `XAIAdapterResult` objects are normalized to the same
+result type used by built-in adapters.
 
 Rules-vs-weights methods use the same pattern:
 

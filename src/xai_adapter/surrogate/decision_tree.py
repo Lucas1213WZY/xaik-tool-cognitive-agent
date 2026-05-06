@@ -8,10 +8,11 @@ from typing import Any, Dict, List, Optional, Union
 import numpy as np
 import pandas as pd
 
-from ..base import ArrayLike, XAIAdapter, XAIAdapterResult, ensure_2d
+from ..base import ArrayLike, XAIAdapterResult, ensure_2d
+from .base import SurrogateMethod
 
 
-class DecisionTreeSurrogateMethod(XAIAdapter):
+class DecisionTreeSurrogateMethod(SurrogateMethod):
     """
     Decision-tree surrogate method for rules-vs-weights comparisons.
 

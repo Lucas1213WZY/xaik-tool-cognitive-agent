@@ -87,14 +87,13 @@ src/
 │   ├── api.py                          (engine-based convenience constructors)
 │   ├── registry.py                     (adapter registry)
 │   ├── dataset.py                      (thin precomputed CSV XAI wrapper)
-│   ├── feature_attribution_method/
-│   │   ├── lofo.py
-│   │   ├── shap_kernel.py
-│   │   ├── lime_tabular.py
-│   │   ├── gradient_input.py
-│   │   ├── deep_lift.py
-│   │   ├── integrated_gradients.py
-│   │   └── sklearn_global.py
+│   ├── attribution/
+│   │   ├── base.py
+│   │   ├── perturbation.py
+│   │   ├── tabular.py
+│   │   ├── gradient.py
+│   │   ├── captum.py
+│   │   └── global_importance.py
 │   └── surrogate/
 │       ├── decision_tree.py
 │       └── logistic_regression.py

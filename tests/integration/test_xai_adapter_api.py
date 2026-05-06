@@ -8,11 +8,14 @@ import numpy as np
 
 from src.data_loaders import XAIDatasetParser
 from src.xai_adapter import (
+    create_custom_xai_method,
     create_xai_method,
     create_xai_method_from_engine,
     generate_surrogate_xai_methods,
     get_adapter_registry,
+    register_xai_method,
 )
+from src.xai_adapter.attribution import KernelShap, LimeTabular, LeaveOneFeatureOut
 
 
 def _predict_proba(x):
@@ -51,6 +54,38 @@ def test_lofo_xai_method_returns_normalized_result():
     assert result.method == "lofo"
     assert result.values.shape == (2, 2)
     assert result.base_values.shape == (2,)
+    np.testing.assert_allclose(result.attributions, result.values)
+    np.testing.assert_allclose(result.importances, np.abs(result.values))
+
+
+def test_attribution_namespace_exposes_library_backed_methods():
+    assert KernelShap.__name__ == "KernelShap"
+    assert LimeTabular.__name__ == "LimeTabular"
+    assert LeaveOneFeatureOut.__name__ == "LeaveOneFeatureOut"
+
+
+def test_custom_callable_can_be_wrapped_as_xai_method():
+    def custom_algorithm(x):
+        return np.asarray(x, dtype=float) * 2.0
+
+    adapter = create_custom_xai_method(custom_algorithm, method_name="double")
+    result = adapter.attribute(np.array([[1.0, -2.0]]))
+
+    assert result.method == "double"
+    np.testing.assert_allclose(result.values, np.array([[2.0, -4.0]]))
+    np.testing.assert_allclose(result.importances, np.array([[2.0, 4.0]]))
+
+
+def test_custom_callable_can_be_registered_in_global_registry():
+    def custom_algorithm(x):
+        return np.ones_like(np.asarray(x, dtype=float))
+
+    register_xai_method("unit_test_custom", custom_algorithm, "unit_test_custom_alias")
+    adapter = create_xai_method("unit_test_custom_alias")
+    result = adapter.explain(np.array([[3.0, 4.0]]))
+
+    assert result.method == "unit_test_custom"
+    np.testing.assert_allclose(result.values, np.array([[1.0, 1.0]]))
 
 
 def test_create_xai_method_from_engine_supports_coax_style_inputs():

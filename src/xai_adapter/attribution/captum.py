@@ -1,4 +1,4 @@
-"""Shared Captum attribution method helpers."""
+"""Captum-backed attribution methods."""
 
 from __future__ import annotations
 
@@ -8,17 +8,17 @@ import numpy as np
 
 from ..base import (
     ArrayLike,
-    PreprocessFn,
     PostprocessFn,
-    XAIAdapter,
+    PreprocessFn,
     XAIAdapterResult,
     baseline_from_data,
     ensure_2d,
     select_target,
 )
+from .base import LocalAttribution
 
 
-class _CaptumMethod(XAIAdapter):
+class CaptumAttribution(LocalAttribution):
     """Base class for Captum attribution methods."""
 
     captum_attr_cls = None
@@ -104,3 +104,45 @@ class _CaptumMethod(XAIAdapter):
             method=self.method_name,
             metadata={"baseline": baselines.detach().cpu().numpy()},
         )
+
+
+class DeepLift(CaptumAttribution):
+    """Captum DeepLift method."""
+
+    method_name = "deeplift"
+
+    def __init__(self, **kwargs):
+        try:
+            from captum.attr import DeepLift as CaptumDeepLift
+        except ImportError as exc:
+            raise ImportError("Captum is required for DeepLift. Install with: pip install captum") from exc
+        self.captum_attr_cls = CaptumDeepLift
+        super().__init__(**kwargs)
+
+
+class IntegratedGradients(CaptumAttribution):
+    """Captum Integrated Gradients method."""
+
+    method_name = "integrated_gradients"
+
+    def __init__(self, *, n_steps: int = 50, **kwargs):
+        try:
+            from captum.attr import IntegratedGradients as CaptumIntegratedGradients
+        except ImportError as exc:
+            raise ImportError("Captum is required for IntegratedGradients. Install with: pip install captum") from exc
+        self.captum_attr_cls = CaptumIntegratedGradients
+        kwargs.setdefault("n_steps", n_steps)
+        super().__init__(**kwargs)
+
+
+DeepLiftMethod = DeepLift
+IntegratedGradientsMethod = IntegratedGradients
+
+
+__all__ = [
+    "CaptumAttribution",
+    "DeepLift",
+    "DeepLiftMethod",
+    "IntegratedGradients",
+    "IntegratedGradientsMethod",
+]

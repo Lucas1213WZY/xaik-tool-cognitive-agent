@@ -1,4 +1,4 @@
-"""Gradient x input attribution method."""
+"""Gradient-based attribution methods."""
 
 from __future__ import annotations
 
@@ -8,17 +8,17 @@ import numpy as np
 
 from ..base import (
     ArrayLike,
-    PreprocessFn,
     PostprocessFn,
-    XAIAdapter,
+    PreprocessFn,
     XAIAdapterResult,
     baseline_from_data,
     ensure_2d,
     select_target,
 )
+from .base import LocalAttribution
 
 
-class GradientInputMethod(XAIAdapter):
+class GradientInput(LocalAttribution):
     """Gradient times input method for differentiable torch models."""
 
     method_name = "gradient_input"
@@ -43,7 +43,7 @@ class GradientInputMethod(XAIAdapter):
         try:
             import torch
         except ImportError as exc:
-            raise ImportError("PyTorch is required for GradientInputMethod. Install with: pip install torch") from exc
+            raise ImportError("PyTorch is required for GradientInput. Install with: pip install torch") from exc
 
         self.torch = torch
         self.model = model
@@ -89,3 +89,12 @@ class GradientInputMethod(XAIAdapter):
             base_values=np.full(values.shape[0], self.baseline_value, dtype=float),
             method=self.method_name,
         )
+
+
+GradientInputMethod = GradientInput
+
+
+__all__ = [
+    "GradientInput",
+    "GradientInputMethod",
+]

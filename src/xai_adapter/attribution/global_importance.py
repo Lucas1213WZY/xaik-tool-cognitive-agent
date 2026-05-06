@@ -1,4 +1,4 @@
-"""Global feature importance method for sklearn-style estimators."""
+"""Global feature-importance methods."""
 
 from __future__ import annotations
 
@@ -6,8 +6,10 @@ from typing import Any, Dict, List, Optional
 
 import numpy as np
 
+from .base import GlobalImportance
 
-class SklearnGlobalFeatureImportanceMethod:
+
+class SklearnFeatureImportance(GlobalImportance):
     """Global feature importance from sklearn-style fitted estimators."""
 
     method_name = "sklearn_global_feature_importance"
@@ -49,3 +51,12 @@ class SklearnGlobalFeatureImportanceMethod:
             "feature_names": feature_names,
             "records": records,
         }
+
+
+SklearnGlobalFeatureImportanceMethod = SklearnFeatureImportance
+
+
+__all__ = [
+    "SklearnFeatureImportance",
+    "SklearnGlobalFeatureImportanceMethod",
+]

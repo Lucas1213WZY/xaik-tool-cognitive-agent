@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any, List, Optional, Sequence
 
 from .base import ArrayLike
+from .attribution import make_attribution
 from src.data_loaders.xai_dataset import XAIDatasetParser
 from .registry import create_xai_method
 from .surrogate import GeneratedSurrogateMethods
@@ -105,6 +106,22 @@ def create_xai_method_from_engine(
         )
 
     return create_xai_method(name, **kwargs)
+
+
+def create_custom_xai_method(
+    algorithm: Any,
+    *,
+    method_name: str = "custom",
+    **kwargs,
+):
+    """
+    Wrap a user-provided function or object in the common XAI adapter API.
+
+    The algorithm can be a callable, or an object exposing `fit`, `explain`, or
+    `attribute`. The returned adapter supports `fit`, `explain`, and
+    Captum-style `attribute`.
+    """
+    return make_attribution(algorithm, method_name=method_name, **kwargs)
 
 
 def create_coxam_xai_method(

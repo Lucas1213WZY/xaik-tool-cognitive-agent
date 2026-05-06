@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CoAX Cognitive Parameter Demo</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="topbar">
+        <div>
+          <p class="eyebrow">CoAX Demo</p>
+          <h1>Cognitive Parameter Builder</h1>
+        </div>
+        <button id="downloadConfig" type="button">Download Config</button>
+      </section>
+
+      <section class="status" id="status">
+        Loading ranges from <code>assets/demo/coax_cognitive_parameter_ranges.json</code>
+      </section>
+
+      <section class="layout">
+        <aside class="panel controls-panel">
+          <div class="field">
+            <label for="appId">App ID</label>
+            <select id="appId"></select>
+          </div>
+
+          <div class="field">
+            <label for="xaiType">XAI Type</label>
+            <select id="xaiType"></select>
+          </div>
+
+          <div class="field">
+            <label for="rangeScope">Slider Ranges</label>
+            <select id="rangeScope">
+              <option value="xai">Selected appId + XAI type ranges</option>
+              <option value="app">Selected appId ranges</option>
+              <option value="global">Global CSV ranges</option>
+            </select>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="tabs" role="tablist" aria-label="Input mode">
+            <button class="tab is-active" type="button" data-mode="ids">Instance IDs</button>
+            <button class="tab" type="button" data-mode="json">Real Instances</button>
+          </div>
+
+          <div id="idsInput" class="input-mode">
+            <label for="instanceIds">Instance IDs</label>
+            <textarea id="instanceIds" spellcheck="false" placeholder="0, 4, 6, 22"></textarea>
+          </div>
+
+          <div id="jsonInput" class="input-mode is-hidden">
+            <label for="instancesJson">Instances JSON</label>
+            <textarea id="instancesJson" spellcheck="false" placeholder='[{"fixed_acidity": 7.4, "volatile_acidity": 0.7}]'></textarea>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="field">
+            <label for="humanResponses">Human Responses</label>
+            <textarea id="humanResponses" spellcheck="false" placeholder='Paste CSV or JSON rows, e.g.&#10;instance_id,response&#10;0,1&#10;4,0'></textarea>
+          </div>
+
+          <div class="mapping-grid">
+            <div class="field">
+              <label for="humanInstanceColumn">Instance Column</label>
+              <select id="humanInstanceColumn"></select>
+            </div>
+            <div class="field">
+              <label for="humanResponseColumn">Response Column</label>
+              <select id="humanResponseColumn"></select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="humanParticipantColumn">Participant Column</label>
+            <select id="humanParticipantColumn"></select>
+          </div>
+        </aside>
+
+        <section class="panel slider-panel">
+          <div class="panel-head">
+            <h2>Cognitive Parameters</h2>
+            <button id="resetSliders" type="button">Reset</button>
+          </div>
+          <div id="sliders" class="sliders"></div>
+        </section>
+
+        <section class="panel output-panel">
+          <div class="panel-head">
+            <h2>Demo Payload</h2>
+            <button id="copyPayload" type="button">Copy</button>
+          </div>
+          <pre id="payloadPreview"></pre>
+        </section>
+
+        <section class="panel human-panel">
+          <div class="panel-head">
+            <h2>Mapped Human Responses</h2>
+          </div>
+          <pre id="humanPreview"></pre>
+        </section>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

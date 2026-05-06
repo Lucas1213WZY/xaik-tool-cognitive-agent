@@ -75,8 +75,18 @@ class XAIAdapterResult:
     metadata: Dict[str, Any] = field(default_factory=dict)
 
     @property
+    def attributions(self) -> np.ndarray:
+        """Signed per-feature attribution values."""
+        return self.values
+
+    @property
+    def importances(self) -> np.ndarray:
+        """Absolute per-feature importance magnitudes."""
+        return np.abs(self.values)
+
+    @property
     def feature_importance(self) -> np.ndarray:
-        """Alias for attribution values."""
+        """Backward-compatible alias for signed attribution values."""
         return self.values
 
 
@@ -109,6 +119,10 @@ class XAIAdapter(ABC):
     @abstractmethod
     def explain(self, instances: ArrayLike) -> XAIAdapterResult:
         """Explain one or more instances."""
+
+    def attribute(self, instances: ArrayLike, **kwargs) -> XAIAdapterResult:
+        """Captum-style alias for `explain(...)`."""
+        return self.explain(instances, **kwargs)
 
     def _postprocess_values(self, raw_instances: ArrayLike, attributions: np.ndarray) -> np.ndarray:
         """Apply attribution postprocessing and ensure batch-major shape."""

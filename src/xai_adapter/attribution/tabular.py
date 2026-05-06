@@ -1,4 +1,4 @@
-"""LIME tabular attribution method."""
+"""Tabular attribution methods backed by tabular XAI libraries."""
 
 from __future__ import annotations
 
@@ -6,10 +6,11 @@ from typing import Callable, List, Optional
 
 import numpy as np
 
-from ..base import ArrayLike, PreprocessFn, PostprocessFn, XAIAdapter, XAIAdapterResult, ensure_2d
+from ..base import ArrayLike, PostprocessFn, PreprocessFn, XAIAdapterResult, ensure_2d
+from .base import LocalAttribution
 
 
-class LimeTabularMethod(XAIAdapter):
+class LimeTabular(LocalAttribution):
     """LIME tabular method with a sklearn-like fit/explain API."""
 
     method_name = "lime_tabular"
@@ -51,7 +52,7 @@ class LimeTabularMethod(XAIAdapter):
             import lime.lime_tabular
             from lime.discretize import BaseDiscretizer
         except ImportError as exc:
-            raise ImportError("LIME is required for LimeTabularMethod. Install with: pip install lime") from exc
+            raise ImportError("LIME is required for LimeTabular. Install with: pip install lime") from exc
 
         training_data = ensure_2d(X)
         training_labels = y if y is not None else self.training_labels
@@ -119,3 +120,12 @@ class LimeTabularMethod(XAIAdapter):
             method=self.method_name,
             metadata={"explanation_objects": explanation_objects},
         )
+
+
+LimeTabularMethod = LimeTabular
+
+
+__all__ = [
+    "LimeTabular",
+    "LimeTabularMethod",
+]

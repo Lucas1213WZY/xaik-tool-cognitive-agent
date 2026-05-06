@@ -2,16 +2,14 @@
 
 from __future__ import annotations
 
-from typing import Dict, Type
-
-from .base import XAIAdapter
+from typing import Any, Dict, Type
 
 
 class XAIAdapterRegistry:
     """Small registry for adapter classes."""
 
     def __init__(self):
-        self._registry: Dict[str, Type] = {}
+        self._registry: Dict[str, Any] = {}
 
     def register(self, name: str, adapter_class: Type, *aliases: str) -> None:
         """Register an adapter class."""
@@ -19,8 +17,17 @@ class XAIAdapterRegistry:
         for alias in aliases:
             self._registry[alias.lower()] = adapter_class
 
-    def get_class(self, name: str) -> Type:
-        """Return the adapter class for a registered name."""
+    def register_custom(self, name: str, algorithm: Any, *aliases: str) -> None:
+        """Register a user-provided function or object as an XAI method."""
+        from .attribution import CustomAttribution
+
+        def factory(**kwargs):
+            return CustomAttribution(algorithm, method_name=name, **kwargs)
+
+        self.register(name, factory, *aliases)
+
+    def get_class(self, name: str) -> Any:
+        """Return the adapter class or factory for a registered name."""
         key = name.lower()
         if key not in self._registry:
             raise ValueError(f"Unknown XAI adapter '{name}'. Available: {self.list_available()}")
@@ -47,7 +54,7 @@ def get_adapter_registry() -> XAIAdapterRegistry:
     global _GLOBAL_REGISTRY
     if _GLOBAL_REGISTRY is None:
         from .dataset import PrecomputedCSVXAIMethod
-        from .feature_attribution_method import (
+        from .attribution import (
             DeepLiftMethod,
             GradientInputMethod,
             IntegratedGradientsMethod,
@@ -76,3 +83,16 @@ def get_adapter_registry() -> XAIAdapterRegistry:
 def create_xai_method(name: str, **kwargs):
     """Create an XAI method adapter from the global registry."""
     return get_adapter_registry().create(name, **kwargs)
+
+
+def register_xai_method(name: str, adapter: Any, *aliases: str) -> None:
+    """
+    Register a custom XAI method.
+
+    `adapter` can be an adapter class/factory that returns an XAIAdapter-like
+    object, or a plain function/object to be wrapped as a CustomAttribution.
+    """
+    if isinstance(adapter, type):
+        get_adapter_registry().register(name, adapter, *aliases)
+        return
+    get_adapter_registry().register_custom(name, adapter, *aliases)
